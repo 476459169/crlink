@@ -1,0 +1,88 @@
+{
+	"pages": [
+		{
+			"path": "pages/home/home",
+			"style": {
+				"navigationBarTitleText": "首页",
+				"enablePullDownRefresh":true
+			}
+		},
+		{
+			"path": "pages/mine/mine",
+			"style": {
+				"navigationStyle":"custom",
+				"navigationBarTitleText": "我的"
+			}
+		},
+		{
+			"path": "pages/record/record",
+			"style": {
+				"navigationBarTitleText": "学习记录"
+			}
+		},
+		{
+			"path": "pages/mine/login",
+			"style": {
+				"navigationBarTitleText": "登录"
+			}
+		},
+		{
+			"path": "pages/mine/regist",
+			"style": {
+				"navigationBarTitleText": "注册"
+			}
+		},
+		{
+			"path": "pages/mine/UserRegistrationAgreement",
+			"style": {
+				"navigationBarTitleText": "用户注册协议"
+			}
+		},
+		{
+			"path": "pages/home/videoDetail",
+			 "pageOrientation":"auto",
+			"style": {
+				"navigationBarTitleText": "课程详情",
+				"enablePullDownRefresh":true
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#FFFFFF",
+		"backgroundColor": "#FFFFFF"
+		
+	},
+	"tabBar": {
+		"color": "#7A7E83",
+		"selectedColor": "#ca5a30",
+		"borderStyle": "black",
+		"backgroundColor": "#ffffff",
+		"list": [{
+			"pagePath": "pages/home/home",
+			"iconPath": "static/home_g.png",
+			"selectedIconPath": "static/home_o.png",
+			"text": "首页"
+		},  {
+			"pagePath": "pages/mine/mine",
+			"iconPath": "static/mine_g.png",
+			"selectedIconPath": "static/mine_o.png",
+			"text": "我的"
+		}]
+	},
+	
+	"condition": { //模式配置，仅开发期间生效
+	    "current": 0, //当前激活的模式（list 的索引项）
+	    "list": [{
+	            "name": "home", //模式名称
+	            "path": "pages/home/home" //启动页面，必选
+	            // "query": "interval=4000&autoplay=false" //启动参数，在页面的onLoad函数里面得到。
+	        },
+	        {
+	            "name": "vdodetail",
+	            "path": "pages/home/videoDetail"
+	        }
+	    ]
+	}
+}
