@@ -7,7 +7,7 @@
 			<view class="topView">
 				<view>
 					<video id="myVideo" :src="videoUrl" direction="-90" @play="vdoPlay" @error="videoErrorCallback" @pause="vdopause"
-					 style="z-index: 1;"></video>
+					 @timeupdate="vedioTimeUpDate" @progress="vedioProgress" style="z-index: 1;"></video>
 				</view>
 
 				<view class="scorl_item">
@@ -146,7 +146,7 @@
 				<uni-popup-dialog mode="input" title="提问" value="" placeholder="请输入内容" @confirm="dialogInputConfirm"></uni-popup-dialog>
 			</uni-popup>
 
-
+			<!-- 回复 -->
 			<uni-popup ref="dialogInputreply" type="dialog" style="z-index:999;">
 				<uni-popup-dialog mode="input" title="回复" value="" placeholder="请输入内容" @confirm="replyConfirm"></uni-popup-dialog>
 			</uni-popup>
@@ -162,10 +162,7 @@
 	import uniPopupMessage from '@/components/uni-popup/uni-popup-message.vue'
 	import uniPopupDialog from '@/components/uni-popup/uni-popup-dialog.vue'
 	import uniPopupShare from '@/components/uni-popup/uni-popup-share.vue'
-
-
 	var _this;
-
 	var timer = null;
 	export default {
 		components: {
@@ -193,20 +190,8 @@
 				baseUrl: "http://39.105.48.243:8080/crlink/",
 				loading: "加载更多",
 				page: 1,
-				replyItem:{
-			imgUrl: "upload/user/oQ9YD0hq0bbhvt6akAAGoIRqgfA4.png",
-			realName: "Masker",
-			isGood: 0,
-			queUserId: "8a71edd96a9c2a22016aaee6cd7b016e",
-			currentName: "Masker",
-			id: "2c91ac1f7210ee9001723091bc07003c",
-			time: "2020-05-20 13:32:37",
-			title: "Pppppp",
-			isReply: 0,
-			goodNum: 0,
-			replyArr:[]
-		},
-				replyUserid:''
+				replyItem: Object,
+				replyUserid: ''
 
 			}
 		},
@@ -217,8 +202,7 @@
 			this.getNetMessage();
 			this.getQues(this.page);
 		},
-		onShow() {
-		},
+		onShow() {},
 		computed: {
 
 
@@ -263,16 +247,6 @@
 				return ["cra", "crc"]
 			},
 
-
-			htmlStr() {
-
-				let str = 'src="123/234"'
-
-				let str1 = this.myData.detail.toString().replace(/src="/g, 'src="http://39.105.48.243:8080/crlink');
-				console.log(str1);
-				return str1
-
-			}
 		},
 		onReady: function(res) {
 			this.videoContext = uni.createVideoContext('myVideo')
@@ -285,7 +259,6 @@
 		},
 
 		onReachBottom: function() { //当划到最底部的时候触发事件
-			console.log("我是最底部了");
 			if (timer != null) { //加载缓冲延迟
 				clearTimeout(timer);
 			}
@@ -295,6 +268,15 @@
 		},
 		methods: {
 
+
+			vedioTimeUpDate(e) {
+				// console.log("currentTime"+e.detail.currentTime+"duration"+e.detail.duration);
+			},
+
+			vedioProgress(e) {
+				console.log("buffered");
+				console.log("buffered" + e.detail.buffered);
+			},
 
 			videoErrorCallback: function(e) {
 				uni.showModal({
@@ -306,7 +288,6 @@
 			//获取详情信息
 			getNetMessage: function() {
 
-
 				var loginkey = uni.getStorageSync('loginKey');
 				this.$api.post('index!ajaxGetCourseDetail.action', {
 					id: _this.couserID,
@@ -315,7 +296,6 @@
 					if (res.res.status == 0) {
 						_this.myData = res.inf;
 						_this.videoUrl = res.inf.parts[0].videoUrl;
-						console.log("sssss +");
 						// this.videoContext.pause(); 
 						if (res.inf.viewType == 2 && res.inf.isBuy == 1) { //判断是否需要购买 是否已经购买
 							_this.autoPlay = true;
@@ -329,8 +309,6 @@
 			//获取提问信息
 			getQues(e) {
 
-				console.log("getques " + e);
-
 				var loginkey = uni.getStorageSync('loginKey');
 				this.$api.post('live!ajaxGetCourseQuestion.action', {
 					id: _this.couserID,
@@ -339,21 +317,27 @@
 				}).then(res => {
 					if (res.res.status == 0) {
 						if (e == 1) {
-							_this.quesArr = res.inf.arr;
+							let array = res.inf.arr;
+							array.forEach(item => {
+
+								if (!item.replyArr) {
+									item.replyArr = []
+								}
+								_this.quesArr.push(item)
+							})
+
 							_this.page++;
 						} else {
 							if (e <= res.inf.pageCount) {
 								console.log("ques= " + _this.quesArr)
 								_this.quesArr = _this.quesArr.concat(res.inf.arr); //进行数据的累加
-								
-								
-								uni.hideNavigationBarLoading();
-								uni.stopPullDownRefresh(); //数据加载完成,刷新结束
 								_this.page++; //页数的++
 								_this.loading = "加载更多";
 							}
 						}
-					
+						uni.hideNavigationBarLoading();
+						uni.stopPullDownRefresh(); //数据加载完成,刷新结束
+
 					}
 				})
 			},
@@ -376,28 +360,24 @@
 						_this.quesArr = [];
 						_this.page = 1;
 						_this.getQues(_this.page)
-
 					} else {
-
 						uni.showModal({
-							title: 提交失败
+							title: "提交失败"
 						})
 					}
 				})
 			},
 			//回复层主
-			reply(item,replyuserid,str){
-				
-				
-				console.log("zhiqian = "+_this.replyItem.replyArr);
+			reply(item, replyuserid, str) {
+				console.log("zhiqian = " + _this.replyItem.replyArr + _this.quesArr);
 				var loginkey = uni.getStorageSync('loginKey');
 				this.$api.post('live!ajaxAddCourseQuestionReply.action', {
 					detail: str,
 					loginKey: loginkey,
 					partId: _this.myData.parts[0].partId,
-					id:item.id,
-					replyId:replyuserid?replyuserid:item.id,
-					replyUserId:replyuserid?replyuserid:'',
+					id: item.id,
+					replyId: replyuserid ? replyuserid : item.id,
+					replyUserId: replyuserid ? replyuserid : '',
 				}).then(res => {
 
 					if (res.res.status == 0) {
@@ -405,12 +385,12 @@
 							title: '提交成功'
 						});
 						_this.replyUserid = '';
-						_this.replyItem.replyArr =  res.inf.replyArr;
-						console.log("zhihou="+_this.replyItem.replyArr);
-						
+						_this.replyItem.replyArr = res.inf.replyArr;
+						console.log("zhihou=" + _this.replyItem.replyArr + _this.quesArr);
+
 					} else {
 						uni.showModal({
-							title: 提交失败
+							title: '提交失败'
 						})
 					}
 				})
@@ -447,7 +427,7 @@
 						}
 					});
 					this.timer = setInterval(() => {
-						this.videoContext.pause();
+						// this.videoContext.pause();
 						clearInterval(this.timer)
 
 					}, 500)
@@ -477,7 +457,6 @@
 			},
 
 			//回复
-
 			replyBtnClick(item) {
 				var loginkey = uni.getStorageSync('loginKey');
 				if (loginkey.length <= 0) {
@@ -490,18 +469,17 @@
 				}
 			},
 			//直接点击名称回复
-			replyQueser(item,replyUserId) {
+			replyQueser(item, replyUserId) {
 				this.replyItem = item
 				this.replyUserid = replyUserId
 				this.$refs.dialogInputreply.open()
 			},
-			
+
 			//确定回复
 			replyConfirm(done, val) {
-				console.log("replyConfirm");
-				this.reply(this.replyItem,this.replyUserid,val)
-				done(); 
-			
+				this.reply(this.replyItem, this.replyUserid, val)
+				done();
+
 			},
 
 			//点赞
@@ -520,7 +498,7 @@
 						_this.getQues(_this.page)
 					} else {
 						uni.showModal({
-							title: 点赞失败
+							title: "点赞失败"
 						})
 					}
 				})
@@ -534,7 +512,7 @@
 				done()
 			},
 
-		
+
 		},
 		filters: {
 			/**
@@ -552,7 +530,6 @@
 					// match = match.replace(/style="[^"]+"/gi, '').replace(/style='[^']+'/gi, '');
 					// match = match.replace(/width="[^"]+"/gi, '').replace(/width='[^']+'/gi, '');
 					// match = match.replace(/height="[^"]+"/gi, '').replace(/height='[^']+'/gi, '');
-					console.log("match = " + match);
 					return match;
 				});
 

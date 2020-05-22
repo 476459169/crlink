@@ -28,20 +28,20 @@
 			</view>
 			<view class="panel__bd">
 				<view class="course" v-for="(item, index) in course" :key="index" @click="itemClcik(item)">
-					<image :src="'http://api.crlink.com/'+item.imgUrl" class="itemImage"></image>
+					<image :src="'http://api.crlink.com/'+item.collegeImgUrl" class="itemImage"></image>
 					<view class="itemContent">
 						<view style="font-size: 17px;">
-							{{item.title}}
+							{{item.collegeName}}
 						</view>
 						<view style="color: #666666; font-size: 16px;">
-							包含：53节
+							包含：{{item.courseCount}}节
 						</view>
 						<view style="display: flex;">
 							<view class="text_money">
-								¥{{item.buyPrice}}
+								¥{{item.collegeFee}}
 							</view>
 							<view class="text_xh">
-								¥{{item.buyPrice}}
+								¥{{item.originalCollegeFee}}
 							</view>
 						</view>
 
@@ -84,7 +84,7 @@
 				})
 			},
 			getIndexCourse() {
-				this.$api.post('index!ajaxGetIndexCourse.action').then(res => {
+				this.$api.post('index!ajaxGetIndexCollege.action').then(res => {
 					if (res.res.status == 0) {
 						this.course = res.inf.arr
 					} 
