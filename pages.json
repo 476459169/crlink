@@ -46,7 +46,14 @@
 				"enablePullDownRefresh":true
 			}
 		}
-	],
+	    ,{
+            "path" : "pages/home/college",
+            "style" : {
+				"navigationBarTitleText": "学院课程"
+			}
+        }
+		
+    ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "uni-app",
@@ -82,7 +89,11 @@
 	        {
 	            "name": "vdodetail",
 	            "path": "pages/home/videoDetail"
-	        }
+	        },
+			{
+			    "name": "college",
+			    "path": "pages/home/college"
+			}
 	    ]
 	}
 }

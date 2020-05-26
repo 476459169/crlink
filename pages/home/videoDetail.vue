@@ -51,24 +51,23 @@
 						</view>
 					</view>
 				</view>
-				<view class="belongCollege" v-if="showCollege">
+				<view class="belongCollege" >
 					<view class="showMessage_flexView">
 						<view class="belongCollegeTitle">所属学院</view>
 						<view class="belongCollegeMore">更多 ⟩</view>
 					</view>
 					<view class="showMessage_flexView">
-						<view class="belongcollegeimg" v-for="(item,index) in collegeArr">
-							<image class="collegimage" src="../../static/image/cell.png" mode="aspectFit"></image>
+						<view class="belongcollegeimg" v-for="(item,index) in myData.colleges" :key="index">
+							<image class="collegimage" :src="baseUrl+item.collegeImgUrl" mode="aspectFit"></image>
 							<view class="collegeImageTextview">
-								{{item}}
+								{{item.collegeName}}
 							</view>
 						</view>
 					</view>
 				</view>
 				<view class="line"></view>
-				<view class="course_ap">课程安排</view>
 				<view class="bottomView">
-					<!-- <rich-text :nodes="htmlStr"></rich-text> -->
+					<rich-text :nodes="myData.detail|formatRichText"></rich-text>
 				</view>
 			</view>
 
@@ -123,13 +122,13 @@
 
 			<view class="fixedBottom">
 
-				<view v-if="selectIndex==0" class="buy_class">
+				<view v-if="selectIndex==0 && myData.viewType !==0" class="buy_class">
 					<view style="background-color: #fd6666;width: 50%;color: #FFFFFF;">
 						<view style="width: 100%;text-align: center;font-size: 14px;line-height: 22.5px;padding: 0px 0px;">
-							单独购买
+							{{myData.isBuy==1?'已购买':'单独购买'}}
 						</view>
 						<view style="width: 100%;text-align: center;font-size: 14px;line-height: 22.5px;padding: 0px 0px;">
-							￥99
+							{{myData.isBuy==1?'到期时间'+myData.remainDays:'￥'+myData.buyPrice}}
 						</view>
 					</view>
 					<view style="font-size: 16px;color:#fd6666 ;background-color: #f3cbc3;text-align: center;line-height: 45px;width: 50%;">
@@ -183,7 +182,7 @@
 				itemSelectClass: 'courserItems_style',
 				collegeArr: ["1", "2"],
 				myData: Object,
-				quesArr: Object,
+				quesArr: [],
 				iscollege: false,
 				videoUrl: "",
 				autoPlay: false,
@@ -232,10 +231,6 @@
 			},
 
 
-			showCollege: function() {
-
-				return true
-			},
 
 			glCollegeArr: function() {
 				// if (this.myData.type.length > 2) {
@@ -266,6 +261,30 @@
 				_this.getQues(_this.page);
 			}, 600);
 		},
+		filters: {
+			formatRichText(html) { //控制小程序中图片大小
+
+				if (html) {
+					let newContent = html.toString().replace(/<img[^>]*>/gi, function(match, capture) {
+						// match = match.replace(/src="/g, 'src="http://39.105.48.243:8080/crlink');
+						match = match.replace(/style="[^"]+"/gi, '').replace(/style='[^']+'/gi, '');
+						match = match.replace(/width="[^"]+"/gi, '').replace(/width='[^']+'/gi, '');
+						match = match.replace(/height="[^"]+"/gi, '').replace(/height='[^']+'/gi, '');
+						return match;
+					});
+
+					newContent = newContent.replace(/style="[^"]+"/gi, function(match, capture) {
+						match = match.replace(/width:[^;]+;/gi, 'max-width:100%;').replace(/width:[^;]+;/gi, 'max-width:100%;');
+						return match;
+					});
+					// newContent = newContent.replace(/<br[^>]*\/>/gi, '');
+					newContent = newContent.replace(/\<img/gi,
+						'<img style="max-width:100%;height:auto;display:inline-block;margin:10rpx auto;"');
+					return newContent;
+				}
+
+			}
+		},
 		methods: {
 
 
@@ -288,8 +307,9 @@
 			//获取详情信息
 			getNetMessage: function() {
 
+
 				var loginkey = uni.getStorageSync('loginKey');
-				this.$api.post('index!ajaxGetCourseDetail.action', {
+				this.$api.post('index!ajaxGetCourseDetailNew.action', {
 					id: _this.couserID,
 					loginKey: loginkey
 				}).then(res => {
@@ -323,9 +343,10 @@
 								if (!item.replyArr) {
 									item.replyArr = []
 								}
-								_this.quesArr.push(item)
+								 _this.quesArr.push(item)
 							})
 
+					console.log("ques="+array);
 							_this.page++;
 						} else {
 							if (e <= res.inf.pageCount) {
@@ -514,35 +535,7 @@
 
 
 		},
-		filters: {
-			/**
-			 * 处理富文本里的图片宽度自适应
-			 * 1.去掉img标签里的style、width、height属性
-			 * 2.img标签添加style属性：max-width:100%;height:auto
-			 * 3.修改所有style里的width属性为max-width:100%
-			 * 4.去掉<br/>标签
-			 * @param html
-			 * @returns {void|string|*}
-			 */
-			formatRichText(html) { //控制小程序中图片大小
-				let newContent = html.replace(/<img[^>]*>/gi, function(match, capture) {
-					match = match.replace(/src="/g, 'src="http://39.105.48.243:8080/crlink');
-					// match = match.replace(/style="[^"]+"/gi, '').replace(/style='[^']+'/gi, '');
-					// match = match.replace(/width="[^"]+"/gi, '').replace(/width='[^']+'/gi, '');
-					// match = match.replace(/height="[^"]+"/gi, '').replace(/height='[^']+'/gi, '');
-					return match;
-				});
 
-				newContent = newContent.replace(/style="[^"]+"/gi, function(match, capture) {
-					match = match.replace(/width:[^;]+;/gi, 'max-width:100%;').replace(/width:[^;]+;/gi, 'max-width:100%;');
-					return match;
-				});
-				// newContent = newContent.replace(/<br[^>]*\/>/gi, '');
-				newContent = newContent.replace(/\<img/gi,
-					'<img style="max-width:100%;height:auto;display:inline-block;margin:10rpx auto;"');
-				return newContent;
-			}
-		}
 	}
 </script>
 
@@ -697,7 +690,7 @@
 
 
 	.belongCollege {
-		height: 380upx;
+		// height: 380upx;
 
 		// background-color: #FF976A;
 		.belongCollegeTitle {
@@ -718,7 +711,7 @@
 		.belongcollegeimg {
 			width: 50%;
 			height: 280rpx;
-			flex: 1;
+			// flex: 1;
 		}
 
 		.collegimage {
@@ -734,14 +727,16 @@
 			width: 100%;
 			// line-height: 40px;
 			text-align: center;
-			font-size: 15px;
+			font-size: 13px;
+			color: #666666;
 		}
 	}
 
 
 	.bottomView {
 		font-size: 14px;
-		padding: 20px;
+		padding:10px 20px;
+		background-color: #FFFFFF;
 	}
 
 	.course_ap {
@@ -869,7 +864,7 @@
 					background-color: #FFFFFF;
 
 					image {
-						width: 10px;
+						width: 15px;
 						height: 10px;
 					}
 				}

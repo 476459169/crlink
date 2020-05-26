@@ -28,12 +28,12 @@
 			</view>
 			<view class="panel__bd">
 				<view class="course" v-for="(item, index) in course" :key="index" @click="itemClcik(item)">
-					<image :src="'http://api.crlink.com/'+item.collegeImgUrl" class="itemImage"></image>
+					<image :src="baseurl+item.collegeImgUrl" class="itemImage"></image>
 					<view class="itemContent">
 						<view style="font-size: 17px;">
 							{{item.collegeName}}
 						</view>
-						<view style="color: #666666; font-size: 16px;">
+						<view style="color: #666666; font-size: 16px;"> 
 							包含：{{item.courseCount}}节
 						</view>
 						<view style="display: flex;">
@@ -53,27 +53,36 @@
 </template>
 
 <script>
+	var _this;
+	var timer = null;
 	export default {
 		data() {
 			return {
 				banner: [],
-				course: []
+				course: [],
+				
+				page:1,
+				baseurl:"http://39.105.48.243:8080/crlink/"
 			}
 		},
 		onLoad() {
+			_this = this
 			this.getAdImage()
-			this.getIndexCourse()
+			this.getIndexCourse(this.page)
 		},
 		
 		onPullDownRefresh: function() {
-			console.log('refresh');
-			setTimeout(function() {
-				uni.stopPullDownRefresh();
-			}, 1000);
+			this.page = 1;
+			this.getIndexCourse(this.page)
 		},
 		
 		onReachBottom: function() { //当划到最底部的时候触发事件
-			 console.log("我是最底部了"); 
+			 if (timer != null) { //加载缓冲延迟
+			 	clearTimeout(timer);
+			 }
+			 timer = setTimeout(function() {
+			 	_this.getIndexCourse(_this.page);
+			 }, 600); 
 		},
 		methods: {
 			getAdImage() {
@@ -83,22 +92,49 @@
 					}
 				})
 			},
-			getIndexCourse() {
-				this.$api.post('index!ajaxGetIndexCollege.action').then(res => {
+			getIndexCourse(e) {
+				var loginkey = uni.getStorageSync('loginKey');
+				this.$api.post('index!ajaxGetIndexCollege.action',{firstIndex:e,loginKey:loginkey}).then(res => {
 					if (res.res.status == 0) {
-						this.course = res.inf.arr
+						
+						
+						if (e == 1) {
+							this.course = res.inf.arr
+							_this.page++;
+						}else{
+							if (e <= res.inf.pageCount) {
+								_this.course = _this.course.concat(res.inf.arr); //进行数据的累加
+								_this.page++; //页数的++
+								_this.loading = "加载更多";
+								}
+						}
+						
+						
 					} 
+					uni.hideNavigationBarLoading();
+					uni.stopPullDownRefresh(); //数据加载完成,刷新结束
 				})
 			},
 
 			itemClcik(item) {
-				console.log("itemid = "+item.id);
-				uni.navigateTo({
-					url: './videoDetail?courseID='+item.id,
-					success() {
-						
-					}
-				})
+				
+					var loginkey = uni.getStorageSync('loginKey');
+				if(loginkey.length>0){
+					uni.navigateTo({
+						url: './college?collegeId='+item.id,
+						success() {
+							
+						}
+					})
+				}else{
+					uni.navigateTo({
+						url: '../mine/login',
+						success() {
+							
+						}
+					})
+				}
+				
 
 			}
 		}
