@@ -6,8 +6,9 @@
 		<view class="">
 			<view class="topView">
 				<view>
-					<video id="myVideo" :src="videoUrl" direction="-90" @play="vdoPlay" @error="videoErrorCallback" @pause="vdopause"
-					 @timeupdate="vedioTimeUpDate" @progress="vedioProgress" style="z-index: 1;"></video>
+					<video id="myVideo" :src="videoUrl" direction="-90" enable-progress-gesture="false" @play="vdoPlay" @error="videoErrorCallback"
+					 @pause="vdopause" @ended="videoEnd" @timeupdate="vedioTimeUpDate" style="z-index: 1;">
+					</video>
 				</view>
 
 				<view class="scorl_item">
@@ -34,9 +35,9 @@
 						<image class="showMesage_watch" src="../../static/image/home/vdodetail/watchCount@2x.png" mode=""></image>
 						<view class="showMessage_watchNum">{{myData.viewNum}}</view>
 						<view class="" style="margin-right: 20rpx;display: flex;align-items: center;">
-							<image class="showMessage_bottomImg" src="../../static/image/home/vdodetail/comments@2x.png" mode=""></image>
-							<image class="showMessage_bottomImg" src="../../static/image/home/vdodetail/collection_g@2x.png" mode=""></image>
-							<image class="showMessage_bottomImg" src="../../static/image/home/vdodetail/shareHui@2x.png" mode=""></image>
+							<image class="showMessage_bottomImg" src="../../static/image/home/vdodetail/comments@2x.png" mode="" @click="commentClick()"></image>
+							<image class="showMessage_bottomImg" src="../../static/image/home/vdodetail/collection_g@2x.png" mode="" @click="likeClick()"></image>
+							<image class="showMessage_bottomImg" src="../../static/image/home/vdodetail/shareHui@2x.png" mode="" @click="shareClick()"></image>
 						</view>
 					</view>
 
@@ -46,18 +47,18 @@
 					<view class="showMessage_selectcourseTitle">课程选集</view>
 					<view class="showMessage_selectcourseItems">
 						<view class="showMessage_courseItems " v-bind:class="[itemSelectIndex==index?'courserItems_style':'']" v-for="(item, index) in myData.parts"
-						 :key="item.partTitle" @click="courseItemsSelct(index)">
+						 :key="item.partTitle" @click="courseItemsSelct(index,item)">
 							{{item.partTitle}}
 						</view>
 					</view>
 				</view>
-				<view class="belongCollege" >
+				<view class="belongCollege">
 					<view class="showMessage_flexView">
 						<view class="belongCollegeTitle">所属学院</view>
-						<view class="belongCollegeMore">更多 ⟩</view>
+						<view class="belongCollegeMore" @click="moreClick(myData.id)">更多 ⟩</view>
 					</view>
 					<view class="showMessage_flexView">
-						<view class="belongcollegeimg" v-for="(item,index) in myData.colleges" :key="index">
+						<view class="belongcollegeimg" v-for="(item,index) in myData.colleges" :key="index" @click="collegeItemClick(item)">
 							<image class="collegimage" :src="baseUrl+item.collegeImgUrl" mode="aspectFit"></image>
 							<view class="collegeImageTextview">
 								{{item.collegeName}}
@@ -75,7 +76,7 @@
 			<view v-if="selectIndex==1" class="scorll_class">
 				<view class="quesView" v-for="(item) in quesArr">
 					<view class="quesUser">
-						<image class="quesImg" :url="baseUrl+item.imgUrl" mode=""></image>
+						<image class="quesImg" :src="baseUrl+item.imgUrl" mode=""></image>
 
 						<view class="quesTopUser">
 							<view class="" style="display: flex;height: 25px;">
@@ -119,26 +120,27 @@
 			<!-- </scroll-view> -->
 
 
-
-			<view class="fixedBottom">
-
-				<view v-if="selectIndex==0 && myData.viewType !==0" class="buy_class">
-					<view style="background-color: #fd6666;width: 50%;color: #FFFFFF;">
-						<view style="width: 100%;text-align: center;font-size: 14px;line-height: 22.5px;padding: 0px 0px;">
-							{{myData.isBuy==1?'已购买':'单独购买'}}
+			<view class="" style="height: 45px;">
+				<view class="fixedBottom">
+					<view v-if="selectIndex==0 && myData.viewType !==0" class="buy_class">
+						<view style="background-color: #e8654b;width: 50%;color: #FFFFFF;">
+							<view style="width: 100%;text-align: center;font-size: 14px;line-height: 22.5px;padding: 0px 0px;">
+								{{myData.isBuy==1?'已购买':'单独购买'}}
+							</view>
+							<view style="width: 100%;text-align: center;font-size: 14px;line-height: 22.5px;padding: 0px 0px;">
+								{{myData.isBuy==1?'到期时间'+myData.remainDays:'￥'+myData.buyPrice}}
+							</view>
 						</view>
-						<view style="width: 100%;text-align: center;font-size: 14px;line-height: 22.5px;padding: 0px 0px;">
-							{{myData.isBuy==1?'到期时间'+myData.remainDays:'￥'+myData.buyPrice}}
+						<view style="font-size: 16px;color:#e8654b ;background-color: #f3cbc3;text-align: center;line-height: 45px;width: 50%;">
+							查看所属学院
 						</view>
 					</view>
-					<view style="font-size: 16px;color:#fd6666 ;background-color: #f3cbc3;text-align: center;line-height: 45px;width: 50%;">
-						查看所属学院
+					<view v-else-if="selectIndex==1" class="questions" @click="confirmDialog">
+						提问
 					</view>
-				</view>
-				<view v-else-if="selectIndex==1" class="questions" @click="confirmDialog">
-					提问
 				</view>
 			</view>
+
 
 			<!-- 提交信息 -->
 			<uni-popup ref="dialogInput" type="dialog" style="z-index:999;">
@@ -177,10 +179,10 @@
 				couserID: '',
 				selectIndex: 0,
 				danmuValue: '',
-				courseArr: ["1", "2", "3", "4", "5", "6", "7", "8"],
+				courseArr: [],
 				itemSelectIndex: 0,
 				itemSelectClass: 'courserItems_style',
-				collegeArr: ["1", "2"],
+				collegeArr: [],
 				myData: Object,
 				quesArr: [],
 				iscollege: false,
@@ -190,16 +192,26 @@
 				loading: "加载更多",
 				page: 1,
 				replyItem: Object,
-				replyUserid: ''
-
+				replyUserid: '',
+				videoLastTime: 0,
+				videoItem: Object,
+				playtime: '', //记录播放进度 39：20/50：20
+				seekTime: 0, //历史播放记录
 			}
 		},
 
 		onLoad(e) {
 			_this = this;
 			this.couserID = e.courseID;
+
 			this.getNetMessage();
 			this.getQues(this.page);
+		},
+		onHide() {
+			this.uploadVideoPlayTime('NO')
+		},
+		onUnload() {
+			this.uploadVideoPlayTime('NO')
 		},
 		onShow() {},
 		computed: {
@@ -261,40 +273,29 @@
 				_this.getQues(_this.page);
 			}, 600);
 		},
-		filters: {
-			formatRichText(html) { //控制小程序中图片大小
 
-				if (html) {
-					let newContent = html.toString().replace(/<img[^>]*>/gi, function(match, capture) {
-						// match = match.replace(/src="/g, 'src="http://39.105.48.243:8080/crlink');
-						match = match.replace(/style="[^"]+"/gi, '').replace(/style='[^']+'/gi, '');
-						match = match.replace(/width="[^"]+"/gi, '').replace(/width='[^']+'/gi, '');
-						match = match.replace(/height="[^"]+"/gi, '').replace(/height='[^']+'/gi, '');
-						return match;
-					});
-
-					newContent = newContent.replace(/style="[^"]+"/gi, function(match, capture) {
-						match = match.replace(/width:[^;]+;/gi, 'max-width:100%;').replace(/width:[^;]+;/gi, 'max-width:100%;');
-						return match;
-					});
-					// newContent = newContent.replace(/<br[^>]*\/>/gi, '');
-					newContent = newContent.replace(/\<img/gi,
-						'<img style="max-width:100%;height:auto;display:inline-block;margin:10rpx auto;"');
-					return newContent;
-				}
-
-			}
-		},
 		methods: {
 
 
+			//实时监听播放进度
 			vedioTimeUpDate(e) {
-				// console.log("currentTime"+e.detail.currentTime+"duration"+e.detail.duration);
-			},
+				//如果间隔超过3秒钟 说明有拖动 返回最后记录的播放时间
+				
+				if(this.seekTime>0){
+					this.videoLastTime = this.seekTime;
+					this.videoContext.seek(this.seekTime);
+					this.seekTime =0;
+				}
+				else if (parseInt(e.detail.currentTime) - parseInt(this.videoLastTime) > 3|| parseInt(this.videoLastTime) -
+					parseInt(e.detail.currentTime) > 3) {
+						
 
-			vedioProgress(e) {
-				console.log("buffered");
-				console.log("buffered" + e.detail.buffered);
+							this.videoContext.seek(this.videoLastTime);
+					
+				} else {
+					this.videoLastTime = e.detail.currentTime;
+				}
+
 			},
 
 			videoErrorCallback: function(e) {
@@ -302,6 +303,11 @@
 					content: e.target.errMsg,
 					showCancel: false
 				})
+			},
+
+
+			videoEnd(e) {
+				this.uploadVideoPlayTime('YES')
 			},
 
 			//获取详情信息
@@ -315,13 +321,27 @@
 				}).then(res => {
 					if (res.res.status == 0) {
 						_this.myData = res.inf;
-						_this.videoUrl = res.inf.parts[0].videoUrl;
-						// this.videoContext.pause(); 
+						// _this.videoUrl = res.inf.parts[0].videoUrl;
+						_this.videoItem = res.inf.parts[0];
+						// this.videoContext.pause();  
+						console.log("112233");
+
+						//断点播放
+						_this.seekTime = res.inf.curPartPlayDuration
+						let partN = res.inf.curPartNum
+						let partnum = partN.toInteger()
+
+						console.log("partnum = " + partnum + "seektime=" + _this.videoLastTime);
+						_this.itemSelectIndex = partnum - 1
+						_this.videoItem = res.inf.parts[partnum - 1]
+
+
 						if (res.inf.viewType == 2 && res.inf.isBuy == 1) { //判断是否需要购买 是否已经购买
 							_this.autoPlay = true;
 						} else if (res.inf.viewType == 0) {
 							_this.autoPlay = false;
 						}
+
 
 					}
 				})
@@ -343,10 +363,10 @@
 								if (!item.replyArr) {
 									item.replyArr = []
 								}
-								 _this.quesArr.push(item)
+								_this.quesArr.push(item)
 							})
 
-					console.log("ques="+array);
+							console.log("ques=" + array);
 							_this.page++;
 						} else {
 							if (e <= res.inf.pageCount) {
@@ -417,15 +437,93 @@
 				})
 			},
 
-			itemSelect: function(e) {
-				this.selectIndex = e
+			uploadVideoPlayTime(bl) {
+
+				let sec = parseInt(this.videoLastTime) % 60
+				let min = parseInt(this.videoLastTime) / 60
+				let times = parseInt(min) > 0 ? parseInt(min).toString() + '分' : '' + sec.toString() + '秒' + '/' + _this.videoItem.timeStr
+				var loginkey = uni.getStorageSync('loginKey');
+				var userId = uni.getStorageSync('userId');
+
+				console.log("timestr = " + times);
+				this.$api.post('index!ajaxAddCourseRecordHistory.action', {
+					loginKey: loginkey,
+					userId: userId,
+					courseId: _this.myData.id,
+					partNum: _this.videoItem.partTitle,
+					coursePartId: _this.videoItem.partId,
+					teacherName: _this.myData.author,
+					partPlayDuration: parseInt(_this.videoLastTime),
+					isCompleted: bl,
+					playTime: times,
+					imgUrl: _this.myData.imgUrl,
+					courseTitle: _this.myData.title,
+					watchVideoDuration: parseInt(_this.videoLastTime)
+
+				}).then(res => {
+
+					if (res.res.status == 0) {
+						uni.showToast({
+							title: '提交学习记录成功'
+						});
+						_this.replyUserid = '';
+						_this.replyItem.replyArr = res.inf.replyArr;
+						console.log("zhihou=" + _this.replyItem.replyArr + _this.quesArr);
+
+					} else {
+						uni.showModal({
+							title: '提交失败'
+						})
+					}
+				})
+			},
+
+			//评价
+			commentClick() {
+
+			},
+
+			//收藏
+			likeClick() {
+
+			},
+			//分享
+			shareClick() {
+
 			},
 
 
-			courseItemsSelct: function(e) {
+			itemSelect: function(e) {
+				this.selectIndex = e
+
+			},
+
+			//点击学院按钮
+			collegeItemClick(item) {
+				uni.navigateTo({
+					url: './college?collegeId=' + item.collegeId
+				})
+
+			},
+
+			moreClick(str) {
+				console.log("str = " + str);
+				uni.navigateTo({
+					url: './moreCollege?id=' + str
+				})
+			},
+
+
+			courseItemsSelct: function(e, item) {
 				//更换课程 这里调试数据
-				this.itemSelectIndex = e;
-				this.videoUrl = this.myData.parts[e].videoUrl;
+
+				if (this.itemSelectIndex !== e) {
+					this.videoLastTime = 0;
+					this.itemSelectIndex = e;
+					console.log("e=" + e + "videourl = " + this.myData.parts[e].videoUrl);
+					this.videoItem = item;
+				}
+
 			},
 
 			//vdo
@@ -448,9 +546,8 @@
 						}
 					});
 					this.timer = setInterval(() => {
-						// this.videoContext.pause();
-						clearInterval(this.timer)
-
+						_this.videoContext.pause();
+						clearInterval(_this.timer)
 					}, 500)
 
 				} else {
@@ -536,6 +633,36 @@
 
 		},
 
+		watch: {
+			videoItem(item) {
+				this.videoUrl = item.videoUrl;
+			}
+		},
+		filters: {
+			formatRichText(html) { //控制小程序中图片大小
+
+				if (html) {
+					let newContent = html.toString().replace(/<img[^>]*>/gi, function(match, capture) {
+						// match = match.replace(/src="/g, 'src="http://39.105.48.243:8080/crlink');
+						match = match.replace(/style="[^"]+"/gi, '').replace(/style='[^']+'/gi, '');
+						match = match.replace(/width="[^"]+"/gi, '').replace(/width='[^']+'/gi, '');
+						match = match.replace(/height="[^"]+"/gi, '').replace(/height='[^']+'/gi, '');
+						return match;
+					});
+
+					newContent = newContent.replace(/style="[^"]+"/gi, function(match, capture) {
+						match = match.replace(/width:[^;]+;/gi, 'max-width:100%;').replace(/width:[^;]+;/gi, 'max-width:100%;');
+						return match;
+					});
+					// newContent = newContent.replace(/<br[^>]*\/>/gi, '');
+					newContent = newContent.replace(/\<img/gi,
+						'<img style="max-width:100%;height:auto;display:inline-block;margin:10rpx auto;"');
+					return newContent;
+				}
+
+			}
+		}
+
 	}
 </script>
 
@@ -572,7 +699,7 @@
 	}
 
 	.selected {
-		color: #fd6666;
+		color: #e8654b;
 	}
 
 	.normal {
@@ -610,7 +737,7 @@
 
 		.showMessage_money {
 			margin-left: 15px;
-			color: #F66666;
+			color: #e8654b;
 			font-size: 14px;
 		}
 
@@ -684,8 +811,8 @@
 	}
 
 	.courserItems_style {
-		border-color: #fd6666;
-		color: #fd6666;
+		border-color: #e8654b;
+		color: #e8654b;
 	}
 
 
@@ -735,7 +862,7 @@
 
 	.bottomView {
 		font-size: 14px;
-		padding:10px 20px;
+		padding: 10px 20px;
 		background-color: #FFFFFF;
 	}
 
@@ -759,14 +886,15 @@
 
 	.scorll_class {
 		margin-top: 270px;
-		height: calc(100vh - 310px);
+		// height: calc(100vh - 355px);
+		height: auto;
 		background-color: #FFFFFF;
 	}
 
 	.questions {
 		line-height: 45px;
 		text-align: center;
-		background-color: #fd6666;
+		background-color: #e8654b;
 		font-size: 16px;
 		color: #FFFFFF;
 	}
@@ -792,9 +920,10 @@
 		.quesImg {
 			margin-top: 10px;
 			margin-left: 15px;
-			width: 40px;
+			width: 45px;
 			height: 40px;
-			background-color: #666666;
+			border-radius: 20px;
+
 		}
 
 		.quesName {

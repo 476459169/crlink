@@ -103,6 +103,7 @@
 						if (res.res.status == 0) {
 							var dict = res.inf;
 							console.log(dict);
+							  uni.setStorageSync('userId', dict.userId);
 							uni.setStorage({
 								key: "loginKey",
 								data: dict.loginKey,

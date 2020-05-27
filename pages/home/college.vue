@@ -1,5 +1,7 @@
 <template>
 	<view class="">
+		
+		
 		<view class="topview">
 			<image :src="baseurl+myDataDic.imgUrl" mode="scaleToFill"></image>
 		</view>
@@ -37,7 +39,6 @@
 			</view>
 			<view class="bottomView">
 				<rich-text :nodes="myDataDic.content|formatRichText"></rich-text>
-				<!-- <rich-text :nodes="myDataDic.content"></rich-text> -->
 			</view>
 		</view>
 
@@ -80,9 +81,25 @@
 				<view class="textview">{{item.teacherCompany}}</view>
 
 
+
+			</view>
+
+		</view>
+
+
+		<view class="" style="height: 45px;">
+			<view class="fixedBottom">
+				<view class="buy_class">
+					<view style="background-color: #e8654b;width: 100%;color: #FFFFFF;">
+						<view style="width: 100%;text-align: center;font-size: 16px;line-height: 45px;padding: 0px 0px;">
+							{{myDataDic.isBuy==1?'已购买(剩余'+myDataDic.remainDays+')':'立即购买￥'+myDataDic.collegeFee}}
+						</view>
+					</view>
+				</view>
 			</view>
 		</view>
-	</view>  
+		
+	</view>
 
 </template>
 
@@ -214,25 +231,25 @@
 		},
 		filters: {
 			formatRichText(html) { //控制小程序中图片大小
-			if(html){
-				let newContent = html.replace(/<img[^>]*>/gi, function(match, capture) {
-					// match = match.replace(/src="/g, 'src="http://39.105.48.243:8080/crlink');
-					match = match.replace(/style="[^"]+"/gi, '').replace(/style='[^']+'/gi, '');
-					match = match.replace(/width="[^"]+"/gi, '').replace(/width='[^']+'/gi, '');
-					match = match.replace(/height="[^"]+"/gi, '').replace(/height='[^']+'/gi, '');
-					return match;
-				});
-				
-				newContent = newContent.replace(/style="[^"]+"/gi, function(match, capture) {
-					match = match.replace(/width:[^;]+;/gi, 'max-width:100%;').replace(/width:[^;]+;/gi, 'max-width:100%;');
-					return match;
-				});
-				// newContent = newContent.replace(/<br[^>]*\/>/gi, '');
-				newContent = newContent.replace(/\<img/gi,
-					'<img style="max-width:100%;height:auto;display:inline-block;margin:10rpx auto;"');
-				return newContent;
-			}
-				
+				if (html) {
+					let newContent = html.replace(/<img[^>]*>/gi, function(match, capture) {
+						// match = match.replace(/src="/g, 'src="http://39.105.48.243:8080/crlink');
+						match = match.replace(/style="[^"]+"/gi, '').replace(/style='[^']+'/gi, '');
+						match = match.replace(/width="[^"]+"/gi, '').replace(/width='[^']+'/gi, '');
+						match = match.replace(/height="[^"]+"/gi, '').replace(/height='[^']+'/gi, '');
+						return match;
+					});
+
+					newContent = newContent.replace(/style="[^"]+"/gi, function(match, capture) {
+						match = match.replace(/width:[^;]+;/gi, 'max-width:100%;').replace(/width:[^;]+;/gi, 'max-width:100%;');
+						return match;
+					});
+					// newContent = newContent.replace(/<br[^>]*\/>/gi, '');
+					newContent = newContent.replace(/\<img/gi,
+						'<img style="max-width:100%;height:auto;display:inline-block;margin:10rpx auto;"');
+					return newContent;
+				}
+
 			}
 		}
 
@@ -288,7 +305,7 @@
 			}
 
 			.typeItems_style {
-				color: #fd6666;
+				color: #e8654b;
 				font-size: 15px;
 			}
 		}
@@ -306,7 +323,7 @@
 			background-color: #FFFFFF;
 
 			.itemBuybtn {
-				background-color: #fd6666;
+				background-color: #e8654b;
 				height: 20px;
 				border-radius: 10px;
 				width: 45px;
@@ -319,7 +336,7 @@
 
 			.moneyItem {
 				margin-left: 15px;
-				color: #fd6666;
+				color: #e8654b;
 				font-size: 14px;
 			}
 
@@ -378,7 +395,7 @@
 
 			.showMessage_money {
 				margin-left: 15px;
-				color: #F66666;
+				color: #e8654b;
 				font-size: 14px;
 			}
 
@@ -458,5 +475,18 @@
 				padding: 5px;
 			}
 		}
+	}
+
+	.fixedBottom {
+		position: fixed;
+		bottom: 0rpx;
+		left: 0px;
+		right: 0px;
+		height: 45px;
+	}
+
+	.buy_class {
+		display: flex;
+		height: 45px;
 	}
 </style>

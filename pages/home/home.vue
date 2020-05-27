@@ -208,7 +208,7 @@
 			}
 		}
 	}
-
+  
 	.itemImage {
 		padding: 7.5upx 15upx;
 		width: 40%;
@@ -238,7 +238,7 @@
 
 
 	.text_money {
-		color: #fd6666;
+		color: #e8654b;
 		font-size: 16px;
 	}
 

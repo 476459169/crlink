@@ -53,6 +53,12 @@
 			}
         }
 		
+        ,{
+            "path" : "pages/home/moreCollege",
+            "style" : {
+				"navigationBarTitleText": "更多学院"
+			}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
