@@ -6,8 +6,9 @@
 		<view class="">
 			<view class="topView">
 				<view>
-					<video id="myVideo" :src="videoUrl" direction="-90" enable-progress-gesture="false" @play="vdoPlay" @error="videoErrorCallback"
-					 @pause="vdopause" @ended="videoEnd" @timeupdate="vedioTimeUpDate" style="z-index: 1;">
+					<video id="myVideo" :src="videoUrl" direction="-90" enable-progress-gesture="false" auto-pause-if-navigate="true"
+					 auto-pause-if-open-native="true" @play="vdoPlay" @error="videoErrorCallback" @pause="vdopause" @ended="videoEnd"
+					 @timeupdate="vedioTimeUpDate" style="z-index: 1;">
 					</video>
 				</view>
 
@@ -36,7 +37,10 @@
 						<view class="showMessage_watchNum">{{myData.viewNum}}</view>
 						<view class="" style="margin-right: 20rpx;display: flex;align-items: center;">
 							<image class="showMessage_bottomImg" src="../../static/image/home/vdodetail/comments@2x.png" mode="" @click="commentClick()"></image>
-							<image class="showMessage_bottomImg" src="../../static/image/home/vdodetail/collection_g@2x.png" mode="" @click="likeClick()"></image>
+							<image v-if="myData.isCollect==0" class="showMessage_bottomImg" src="../../static/image/home/vdodetail/collection_g@2x.png"
+							 mode="" @click="likeClick()"></image>
+							<image v-else-if="myData.isCollect==1" class="showMessage_bottomImg" src="../../static/image/home/vdodetail/collection_o@2x.png"
+							 mode="" @click="likeClick()"></image>
 							<image class="showMessage_bottomImg" src="../../static/image/home/vdodetail/shareHui@2x.png" mode="" @click="shareClick()"></image>
 						</view>
 					</view>
@@ -52,7 +56,7 @@
 						</view>
 					</view>
 				</view>
-				<view class="belongCollege">
+				<view class="belongCollege" v-if="!collegeId">
 					<view class="showMessage_flexView">
 						<view class="belongCollegeTitle">所属学院</view>
 						<view class="belongCollegeMore" @click="moreClick(myData.id)">更多 ⟩</view>
@@ -123,7 +127,7 @@
 			<view class="" style="height: 45px;">
 				<view class="fixedBottom">
 					<view v-if="selectIndex==0 && myData.viewType !==0" class="buy_class">
-						<view style="background-color: #e8654b;width: 50%;color: #FFFFFF;">
+						<view style="background-color: #e8654b;width: 50%;color: #FFFFFF; flex: 1;" @click="tobuy()">
 							<view style="width: 100%;text-align: center;font-size: 14px;line-height: 22.5px;padding: 0px 0px;">
 								{{myData.isBuy==1?'已购买':'单独购买'}}
 							</view>
@@ -131,7 +135,7 @@
 								{{myData.isBuy==1?'到期时间'+myData.remainDays:'￥'+myData.buyPrice}}
 							</view>
 						</view>
-						<view style="font-size: 16px;color:#e8654b ;background-color: #f3cbc3;text-align: center;line-height: 45px;width: 50%;">
+						<view v-if="!collegeId" style="font-size: 16px;color:#e8654b ;background-color: #f3cbc3;text-align: center;line-height: 45px;width: 50%;">
 							查看所属学院
 						</view>
 					</view>
@@ -177,38 +181,38 @@
 			return {
 				src: '',
 				couserID: '',
-				selectIndex: 0,
-				danmuValue: '',
-				courseArr: [],
-				itemSelectIndex: 0,
+				collegeId: '',
+				selectIndex: 0, //选项卡选项
+				itemSelectIndex: 0, //课程选集
 				itemSelectClass: 'courserItems_style',
-				collegeArr: [],
-				myData: Object,
-				quesArr: [],
-				iscollege: false,
+				myData: Object, //数据源
+				quesArr: [], //问答数据源
+				// iscollege: false, 
 				videoUrl: "",
 				autoPlay: false,
 				baseUrl: "http://39.105.48.243:8080/crlink/",
 				loading: "加载更多",
-				page: 1,
+				page: 1, //分页加载
 				replyItem: Object,
-				replyUserid: '',
-				videoLastTime: 0,
-				videoItem: Object,
+				replyUserid: '', //回复userID
+				videoLastTime: 0, //记录最后播放时间
+				videoItem: Object, //视频对象数据模型
 				playtime: '', //记录播放进度 39：20/50：20
 				seekTime: 0, //历史播放记录
+				iscollect: 0, //是否收藏
 			}
 		},
 
 		onLoad(e) {
 			_this = this;
 			this.couserID = e.courseID;
-
+			this.collegeId = e.collegeId;
 			this.getNetMessage();
 			this.getQues(this.page);
 		},
 		onHide() {
 			this.uploadVideoPlayTime('NO')
+
 		},
 		onUnload() {
 			this.uploadVideoPlayTime('NO')
@@ -240,19 +244,7 @@
 			courseSelct: function() {
 
 				return {}
-			},
-
-
-
-			glCollegeArr: function() {
-				// if (this.myData.type.length > 2) {
-				// 	return this.myData.type.slice(0, 2);
-				// } else {
-				// 	return this.myData.type
-				// }
-				// console.log("types = " + this.myData.type);
-				return ["cra", "crc"]
-			},
+			}
 
 		},
 		onReady: function(res) {
@@ -280,18 +272,15 @@
 			//实时监听播放进度
 			vedioTimeUpDate(e) {
 				//如果间隔超过3秒钟 说明有拖动 返回最后记录的播放时间
-				
-				if(this.seekTime>0){
+
+				if (this.seekTime > 0) {
 					this.videoLastTime = this.seekTime;
 					this.videoContext.seek(this.seekTime);
-					this.seekTime =0;
-				}
-				else if (parseInt(e.detail.currentTime) - parseInt(this.videoLastTime) > 3|| parseInt(this.videoLastTime) -
+					this.seekTime = 0;
+				} else if (parseInt(e.detail.currentTime) - parseInt(this.videoLastTime) > 3 || parseInt(this.videoLastTime) -
 					parseInt(e.detail.currentTime) > 3) {
-						
+					this.videoContext.seek(this.videoLastTime);
 
-							this.videoContext.seek(this.videoLastTime);
-					
 				} else {
 					this.videoLastTime = e.detail.currentTime;
 				}
@@ -437,6 +426,8 @@
 				})
 			},
 
+
+			//上传播放进度
 			uploadVideoPlayTime(bl) {
 
 				let sec = parseInt(this.videoLastTime) % 60
@@ -444,8 +435,6 @@
 				let times = parseInt(min) > 0 ? parseInt(min).toString() + '分' : '' + sec.toString() + '秒' + '/' + _this.videoItem.timeStr
 				var loginkey = uni.getStorageSync('loginKey');
 				var userId = uni.getStorageSync('userId');
-
-				console.log("timestr = " + times);
 				this.$api.post('index!ajaxAddCourseRecordHistory.action', {
 					loginKey: loginkey,
 					userId: userId,
@@ -458,14 +447,14 @@
 					playTime: times,
 					imgUrl: _this.myData.imgUrl,
 					courseTitle: _this.myData.title,
-					watchVideoDuration: parseInt(_this.videoLastTime)
+					watchVideoDuration: ''
 
 				}).then(res => {
 
 					if (res.res.status == 0) {
-						uni.showToast({
-							title: '提交学习记录成功'
-						});
+						// uni.showToast({
+						// 	title: '提交学习记录成功'
+						// });
 						_this.replyUserid = '';
 						_this.replyItem.replyArr = res.inf.replyArr;
 						console.log("zhihou=" + _this.replyItem.replyArr + _this.quesArr);
@@ -480,16 +469,58 @@
 
 			//评价
 			commentClick() {
+				_this.videoContext.pause();
 
+				uni.navigateTo({
+					url: './VdoDetail/VideoDetailcomment?courseID=' + _this.couserID
+				})
 			},
 
 			//收藏
 			likeClick() {
+				var loginkey = uni.getStorageSync('loginKey');
+				this.$api.post('index!ajaxCollectCourse.action', {
+					loginKey: loginkey,
+					id: _this.couserID, 
+ 
+				}).then(res => {
 
+					if (res.res.status == 0) {
+						_this.myData.isCollect = res.inf.isColl == 1 ? 0 : 1
+					} else {
+						uni.showModal({
+							title: '提交失败'
+						})
+					}
+				})
 			},
 			//分享
 			shareClick() {
-
+				console.log("shareClick");
+				uni.share({
+					
+				    provider: 'weixin',
+				    scene: "WXSceneSession",
+				    type: 5,
+				    imageUrl: 'https://img-cdn-qiniu.dcloud.net.cn/uniapp/app/share-logo@3.png',
+				    title: '欢迎体验uniapp',
+				    miniProgram: {
+				        id: 'gh_19f4ac0477a4',
+				        path: 'pages/home/home',
+				        type: 0,
+				        webUrl: 'http://uniapp.dcloud.io'
+				    },
+				    success: ret => {
+				        console.log(JSON.stringify(ret));
+				    }
+				});
+			},
+			
+			//跳转购买
+			tobuy(){
+				uni.navigateTo({
+					url:'./payView/payView?courseId='+_this.couserID,
+				})
 			},
 
 
@@ -500,6 +531,8 @@
 
 			//点击学院按钮
 			collegeItemClick(item) {
+
+				_this.videoContext.pause();
 				uni.navigateTo({
 					url: './college?collegeId=' + item.collegeId
 				})
@@ -508,6 +541,7 @@
 
 			moreClick(str) {
 				console.log("str = " + str);
+				_this.videoContext.pause();
 				uni.navigateTo({
 					url: './moreCollege?id=' + str
 				})

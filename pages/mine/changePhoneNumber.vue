@@ -3,7 +3,12 @@
 		<view style="margin-top: 100upx;">
 			<view class="item">
 				<image src="../../static/image/mine/phone@2x.png" mode=""></image>
-				<input class="item_ct" type="text" value="" placeholder="手机号" maxlength="11" v-model="phoneNum" />
+				<input class="item_ct" type="text" value="" placeholder="请输入您的新手机号" maxlength="11" v-model="newPhoneNum" />
+			</view>
+			<view class="line"></view>
+			<view class="item">
+				<image src="../../static/image/mine/phone@2x.png" mode=""></image>
+				<input class="item_ct" type="text" value="" placeholder="请输入您的旧手机号" maxlength="11" v-model="phoneNum" />
 			</view>
 			<view class="line"></view>
 			<view class="item">
@@ -12,17 +17,13 @@
 				<button class="yz" type="default" @click="getVerificationCode" :disabled="disabled">{{VerificationMes}} </button>
 			</view>
 			<view class="line"></view>
+			
+			<text class="ts">*请注意查收您新手机号上的验证码</text>
 
 			<view style="margin-top: 100upx;">
-				<view class="logbtn" @click="login">登 录</view>
-			</view>
-			<view style="margin-top: 20upx;">
-				<view class="logbtn" @click="wxlogin">微信快捷登录</view>
+				<view class="logbtn" @click="binding()">绑定手机</view>
 			</view>
 
-			<view style="margin-top: 20upx;">
-				<view class="registbtn" v-on:click="jumpToRegist">新用户？点击这里注册</view>
-			</view>
 
 		</view>
 
@@ -36,7 +37,9 @@
 		data() {
 			return {
 				phoneNum: null,
+				newPhoneNum:null,
 				VerificationCode: null,
+				
 				VerificationMes: "获取验证码",
 				disabled: false
 			}
@@ -46,14 +49,6 @@
 
 		methods: {
 
-			jumpToRegist() {
-				uni.navigateTo({
-					url: './regist',
-					success: res => {},
-					fail: () => {},
-					complete: () => {}
-				});
-			},
 
 			getVerificationCode() {
 				if (!this.phoneNum || this.phoneNum.length !== 11) {
@@ -79,7 +74,7 @@
 					}, 1000)
 
 					this.$api.post('login!ajaxGetPhoneCode.action', {
-						tel: this.phoneNum
+						tel: this.phoneNum,
 					}).then(res => {
 						if (res.res.status == 0) {
 							console.log("获取验证码成功")
@@ -89,49 +84,30 @@
 				}
 
 			},
-
-
-			login() {
-
-				if (this.phoneNum.length == 11 && this.VerificationCode.length > 0) {
-					// console.log("手机号"+this.phoneNum+"yzm"+this.VerificationCode)
-					//注册成功 调用登录接口
-					this.$api.post('login!ajaxLogin.action', {
-						tel: this.phoneNum,
-						phoneCode: this.VerificationCode
+				
+			binding(){
+				var loginkey = uni.getStorageSync('loginKey');
+				this.$api.post('user!updateUserTel.action',{
+					loginKey:loginkey,
+					tel:this.phoneNum,
+					editTel:this.newPhoneNum,
+					phoneCode:this.VerificationCode
 					}).then(res => {
-						if (res.res.status == 0) {
-							var dict = res.inf;
-							console.log(dict);
-							  uni.setStorageSync('userId', dict.userId);
-							uni.setStorage({
-								key: "loginKey",
-								data: dict.loginKey,
-								success() {
-									uni.showToast({
-										title: '登录中···'
-									});
-									setTimeout(function() {
-										uni.navigateBack({
-											delta: 1
-										})
-									}, 1500)
-								}
-							})
-						}
-					})
-
-				} else {
+					if (res.res.status == 0) {
+						uni.showToast({
+							title:'换绑成功'
+						})
+						uni.setStorageSync('userId', res.inf.userId);
+						uni.setStorageSync('loginKey', res.inf.loginKey);
+						uni.navigateBack({delta: 1})
+					}else{
 					uni.showToast({
-						title: '请检查填写项！'
-					});
-				}
-
-			},
-
-			wxlogin() {
-				//微信登录需要后台配合，暂时跳过
+						title:res.res.errMsg
+					})
+					}
+				})
 			}
+
 		}
 	}
 </script>
@@ -149,6 +125,7 @@
 		padding: 0upx 20upx;
 		margin-top: 50upx;
 		box-sizing: border-box;
+		align-items: center;
 
 		image {
 			padding-left: 40upx;
@@ -207,5 +184,11 @@
 		font-weight: bold;
 		border-color: #666666;
 		border-width: 1upx;
+	}
+	
+	.ts{
+		color: #e8654b;
+		font-size: 12px;
+		padding: 20px;
 	}
 </style>

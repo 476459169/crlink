@@ -2,15 +2,15 @@
 	<view>
 		<view class="topview" v-if="islogin">
 			<image class="topimage" src="../../static/image/home/bgmine@2x.png" mode="scaleToFill"></image>
-			<image class="setting" src="../../static/image/mine/setting@2x.png" mode=""></image>
-			<image class="mesg" src="../../static/image/mine/notification@2x.png" mode=""></image>
-			<image class="userimage" src="../../static/image/mine/default_head_img@2x.png" mode="" v-on:click="login"></image>
-			<view class="userName">王浩飞</view>
+			<image class="setting" src="../../static/image/mine/setting@2x.png" mode="" @click="settting()"></image>
+			<!-- <image class="mesg" src="../../static/image/mine/notification@2x.png" mode=""></image> -->
+			<image class="userimage" :src="userInfo.imgUrl?baseUrl+userInfo.imgUrl:'../../static/image/mine/default_head_img@2x.png' " mode="" v-on:click="login"></image>
+			<view class="userName">{{userInfo.nickName}}</view>
 		</view>
 		<view class="topview" v-else>
 			<image class="topimage" src="../../static/image/home/bgmine@2x.png" mode="scaleToFill"></image>
-			<image class="setting" src="../../static/image/mine/setting@2x.png" mode=""></image>
-			<image class="mesg" src="../../static/image/mine/notification@2x.png" mode=""></image>
+			<image class="setting" src="../../static/image/mine/setting@2x.png" mode="" @click="settting()"></image>
+			<!-- <image class="mesg" src="../../static/image/mine/notification@2x.png" mode=""></image> -->
 			<image class="userimage" src="../../static/image/mine/default_head_img@2x.png" mode="" v-on:click="login"></image>
 			<view class="userName">登录/注册</view>
 		</view>
@@ -53,7 +53,7 @@
 			<view style="margin-top: 20upx;" v-if="islogin">
 				<view class="listView_item" @click="logOut">
 
-					<view style="text-align: center;width: 100%;font-size: 34upx;">退出登录</view>
+					<view style="text-align: center;width: 100%;font-size: 34upx; color: #666666;">退出登录</view>
 
 				</view>
 
@@ -74,25 +74,33 @@
 		data() {
 			return {
 				islogin:false,
+				userInfo:Object,
+				baseUrl:"http://39.105.48.243:8080/crlink/"
 			}
 		},
 		onLoad() {
 			console.log("onload")
+			
 		},
 		onShow() {
-			try{
-				var loginKey = uni.getStorageSync("loginKey");
-				if(loginKey.length !=0){
-					this.islogin = true;
-				}
-				   
-			}catch(e){
-			   console.log("error"+e);
-			}
-			
-			
+			this.getuserInfo()
 		},
 		methods: {
+			
+			getuserInfo(){
+				var that = this;
+				var loginkey = uni.getStorageSync('loginKey');
+				this.$api.post('user!ajaxGetUserInfo.action',{loginKey:loginkey}).then(res => {
+					if (res.res.status == 0) {
+						that.userInfo = res.inf
+						that.islogin = true;
+					}else{
+						that.islogin = false;
+						uni.removeStorageSync('loginKey');
+						uni.removeStorageSync('userId');
+					}
+				})
+			},
 			login() {
 				uni.navigateTo({
 					url: './login',
@@ -130,6 +138,23 @@
 				    }
 				});
 			},
+			
+			settting(){
+					var loginkey = uni.getStorageSync('loginKey');
+					console.log("loginkey =" +loginkey );
+					if(loginkey){
+					   uni.navigateTo({
+					   	url:'./setting',
+						success() {
+							
+						}
+					   })
+					}else{
+						uni.navigateTo({
+							url:'./login'
+						})
+					}
+			}
 			
 		
 		}
@@ -171,6 +196,7 @@
 			position: absolute;
 			width: 200upx;
 			height: 200upx;
+			border-radius: 100upx;
 			z-index: 7;
 			right: 50%;
 			top: 50%;

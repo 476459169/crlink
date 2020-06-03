@@ -198,14 +198,15 @@
 			color: #666666;
 
 		}
+		.yz {
+			color: #fd6666;
+			font-size: 24upx;
+			margin-right: 20upx;
+			width: 200upx;
+		}
 	}
 
-	.yz {
-		color: #fd6666;
-		font-size: 24upx;
-		margin-right: 20upx;
-		width: 200upx;
-	}
+	
 
 	// button::after{ border: none; }
 	.line {

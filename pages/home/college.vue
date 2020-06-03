@@ -90,7 +90,7 @@
 		<view class="" style="height: 45px;">
 			<view class="fixedBottom">
 				<view class="buy_class">
-					<view style="background-color: #e8654b;width: 100%;color: #FFFFFF;">
+					<view style="background-color: #e8654b;width: 100%;color: #FFFFFF;" @click="tobuy()">
 						<view style="width: 100%;text-align: center;font-size: 16px;line-height: 45px;padding: 0px 0px;">
 							{{myDataDic.isBuy==1?'已购买(剩余'+myDataDic.remainDays+')':'立即购买￥'+myDataDic.collegeFee}}
 						</view>
@@ -178,11 +178,25 @@
 
 			didselectItem(item) {
 				uni.navigateTo({
-					url: './videoDetail?courseID=' + item.courseId,
-					success() {
+					url: './videoDetail?courseID=' + item.courseId+'&&collegeId='+this.collegeId,
+					success() { 
 
 					}
 				})
+			},
+			
+			//跳转购买页面
+			tobuy(){
+				if (_this.myDataDic.isBuy!==1){
+					uni.navigateTo({
+						url:'./payView/payView?collegeId='+_this.collegeId,
+						success() {
+							
+						}
+					})
+				}
+
+				
 			},
 			//顶部选项卡选择
 			topItemSelect(e) {

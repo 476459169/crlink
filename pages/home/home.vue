@@ -4,20 +4,20 @@
 			<swiper-item v-for="(item, index) in banner" :key="index">
 				<image class="swiper-item" :src="'http://api.crlink.com/'+item.imgUrl" mode="widthFix"></image>
 			</swiper-item>
-		</swiper>
+		</swiper> 
 		<view class="navbar">
-			<view class="navbar-item">
+			<view class="navbar-item" @click="cousersClick()">
 				<image class="thumb" src="../../static/image/home/course.png" mode="aspectFit"></image>
 				<view class="title">课 程</view>
 			</view>
-			<view class="navbar-item">
+			<view class="navbar-item" @click="vertSearch()">
 				<image class="thumb" src="../../static/image/home/find.png" mode="aspectFit"></image>
 				<view class="title">证书查询</view>
 			</view>
-			<view class="navbar-item">
+			<view class="navbar-item"> 
 				<image class="thumb" src="../../static/image/home/exam.png" mode="aspectFit"></image>
 				<view class="title">考 试</view>
-			</view>
+			</view> 
 		</view>
 
 		<view class="panel">
@@ -31,11 +31,11 @@
 					<image :src="baseurl+item.collegeImgUrl" class="itemImage"></image>
 					<view class="itemContent">
 						<view style="font-size: 17px;">
-							{{item.collegeName}}
+							{{item.collegeName}}  
 						</view>
 						<view style="color: #666666; font-size: 16px;"> 
 							包含：{{item.courseCount}}节
-						</view>
+						</view>  
 						<view style="display: flex;">
 							<view class="text_money">
 								¥{{item.collegeFee}}
@@ -53,27 +53,32 @@
 </template>
 
 <script>
-	var _this;
+	var _this; 
 	var timer = null;
 	export default {
 		data() {
 			return {
 				banner: [],
 				course: [],
-				
+				 
 				page:1,
 				baseurl:"http://39.105.48.243:8080/crlink/"
 			}
 		},
 		onLoad() {
 			_this = this
-			this.getAdImage()
+			this.getAdImage() 
 			this.getIndexCourse(this.page)
+		
+		},
+		onShow() {
+			this.getuserInfo()
 		},
 		
 		onPullDownRefresh: function() {
 			this.page = 1;
-			this.getIndexCourse(this.page)
+			this.getIndexCourse(this.page) 
+			
 		},
 		
 		onReachBottom: function() { //当划到最底部的时候触发事件
@@ -85,6 +90,19 @@
 			 }, 600); 
 		},
 		methods: {
+			
+			getuserInfo(){
+				// 
+				var loginkey = uni.getStorageSync('loginKey');
+				this.$api.post('user!ajaxGetUserInfo.action',{loginKey:loginkey}).then(res => {
+					if (res.res.status == 0) {
+						
+					}else{
+						uni.removeStorageSync('loginKey');
+						uni.removeStorageSync('userId');
+					}
+				})
+			},
 			getAdImage() {
 				this.$api.post('index!ajaxGetAdImage.action').then(res => {
 					if (res.res.status == 0) {
@@ -97,7 +115,7 @@
 				this.$api.post('index!ajaxGetIndexCollege.action',{firstIndex:e,loginKey:loginkey}).then(res => {
 					if (res.res.status == 0) {
 						
-						
+						 
 						if (e == 1) {
 							this.course = res.inf.arr
 							_this.page++;
@@ -106,16 +124,37 @@
 								_this.course = _this.course.concat(res.inf.arr); //进行数据的累加
 								_this.page++; //页数的++
 								_this.loading = "加载更多";
+								}else{
+									uni.showToast({
+										title: '没有更多了！'
+									});
 								}
 						}
-						
-						
 					} 
 					uni.hideNavigationBarLoading();
 					uni.stopPullDownRefresh(); //数据加载完成,刷新结束
 				})
 			},
-
+			
+			cousersClick(){
+				var loginkey = uni.getStorageSync('loginKey');
+				if(loginkey.length>0){
+					uni.navigateTo({
+						url: './cousers/cousers',
+						success() {
+							
+						}
+					})
+				}else{
+					uni.navigateTo({
+						url: '../mine/login',
+						success() {
+							
+						}
+					})
+				}
+			},
+ 
 			itemClcik(item) {
 				
 					var loginkey = uni.getStorageSync('loginKey');
@@ -136,6 +175,13 @@
 				}
 				
 
+			},
+			
+				
+			vertSearch(){
+				uni.navigateTo({
+					url:'./certSeach'
+				})
 			}
 		}
 	}
@@ -148,7 +194,7 @@
 		.swiper-item {
 			width: 100%;
 			height: 100%;
-			background-color: #000000;
+			background-color: #000000; 
 		}
 	}
 

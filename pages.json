@@ -43,7 +43,8 @@
 			 "pageOrientation":"auto",
 			"style": {
 				"navigationBarTitleText": "课程详情",
-				"enablePullDownRefresh":true
+				"enablePullDownRefresh":true,
+				"backgroundTextStyle": "dark"
 			}
 		}
 	    ,{
@@ -58,7 +59,50 @@
             "style" : {
 				"navigationBarTitleText": "更多学院"
 			}
-        }
+        },
+		{
+			"path":"pages/home/VdoDetail/VideoDetailcomment",
+				
+			"style":{
+				"navigationBarTitleText": "评论"
+			}
+		},
+		{
+			"path":"pages/home/payView/payView",
+				
+			"style":{
+				"navigationBarTitleText": "支付"
+			}
+		}
+        ,{
+            "path" : "pages/home/cousers/cousers",
+            "style" : {
+				"navigationBarTitleText": "课程",
+				"enablePullDownRefresh": true  ,
+				"backgroundTextStyle": "dark"
+			}
+        },
+		{
+			"path":"pages/mine/changePhoneNumber",
+			"style":{
+				"navigationBarTitleText": "更换手机号"
+			}
+		},
+		{
+			"path":"pages/mine/setting",
+				
+			"style":{
+				"navigationBarTitleText": "设置"
+			}
+		},
+		{
+			"path":"pages/home/certSeach",
+				
+			"style":{
+				"navigationBarTitleText": "证书查询"
+			}
+		}
+		
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
@@ -97,8 +141,8 @@
 	            "path": "pages/home/videoDetail"
 	        },
 			{
-			    "name": "college",
-			    "path": "pages/home/college"
+			    "name": "comment",
+			    "path": "pages/home/VdoDetail/VideoDetailcomment"
 			}
 	    ]
 	}
