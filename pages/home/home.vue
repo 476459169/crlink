@@ -257,14 +257,14 @@
   
 	.itemImage {
 		padding: 7.5upx 15upx;
-		width: 40%;
-		height: 90px;
+		width: 370upx;
+		height: 180upx;
 	}
 
 
 	.itemContent {
 		padding: 10upx 10upx;
-		width: 60%;
+		width: calc(100vw - 370upx);
 		background-color: #FFFFFF;
 		display: block;
 		white-space: nowrap;

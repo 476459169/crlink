@@ -128,13 +128,15 @@
 									})
 								}
 						}
-						uni.hideNavigationBarLoading();
-						uni.stopPullDownRefresh(); //数据加载完成,刷新结束
+						
 					} else {
 						uni.showToast({
 							title: res.res.errMsg
 						})
 					}
+					
+					uni.hideNavigationBarLoading();
+					uni.stopPullDownRefresh(); //数据加载完成,刷新结束
 				})
 			},
 
@@ -312,7 +314,7 @@
 
 	.itemContent {
 		padding: 10upx 10upx;
-		width: 60%;
+		width: calc(100vw - 350upx);
 		background-color: #FFFFFF;
 		display: block;
 		white-space: nowrap;
@@ -322,10 +324,9 @@
 
 	.itemImage {
 		padding: 7.5upx 15upx;
-		width: 40%;
-		height: 90px;
+		width: 350upx;
+		height: 180upx;
 	}
-
 	.text_money {
 		color: #e8654b;
 		font-size: 16px;
@@ -351,6 +352,7 @@
 		color: #666666;
 		height: 40px;
 		align-items: center;
+		padding: 0px 10px;
 
 		text {
 			line-height: 39px;

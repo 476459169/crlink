@@ -103,6 +103,22 @@
 			}
 		}
 		
+        ,{
+            "path" : "pages/mine/studyRecord/studyRecord",
+            "style" : {
+				"navigationBarTitleText": "学习记录",
+				"enablePullDownRefresh": true  ,
+				"backgroundTextStyle": "dark"
+			}
+        }
+        ,{
+            "path" : "pages/mine/watchRecord/watchRecord",
+            "style" : {
+				"navigationBarTitleText": "观看记录",
+				"enablePullDownRefresh": true  ,
+				"backgroundTextStyle": "dark"
+			}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

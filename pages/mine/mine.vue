@@ -4,14 +4,14 @@
 			<image class="topimage" src="../../static/image/home/bgmine@2x.png" mode="scaleToFill"></image>
 			<image class="setting" src="../../static/image/mine/setting@2x.png" mode="" @click="settting()"></image>
 			<!-- <image class="mesg" src="../../static/image/mine/notification@2x.png" mode=""></image> -->
-			<image class="userimage" :src="userInfo.imgUrl?baseUrl+userInfo.imgUrl:'../../static/image/mine/default_head_img@2x.png' " mode="" v-on:click="login"></image>
+			<image class="userimage" :src="userInfo.imgUrl?baseUrl+userInfo.imgUrl:'../../static/image/mine/default_head_img@2x.png' " mode="" v-on:click="login()"></image>
 			<view class="userName">{{userInfo.nickName}}</view>
 		</view>
 		<view class="topview" v-else>
 			<image class="topimage" src="../../static/image/home/bgmine@2x.png" mode="scaleToFill"></image>
 			<image class="setting" src="../../static/image/mine/setting@2x.png" mode="" @click="settting()"></image>
 			<!-- <image class="mesg" src="../../static/image/mine/notification@2x.png" mode=""></image> -->
-			<image class="userimage" src="../../static/image/mine/default_head_img@2x.png" mode="" v-on:click="login"></image>
+			<image class="userimage" src="../../static/image/mine/default_head_img@2x.png" mode="" v-on:click="login()"></image>
 			<view class="userName">登录/注册</view>
 		</view>
 		<view class="listView">
@@ -23,12 +23,12 @@
 				</view>
 			</view>
 			<view style="margin-top: 20upx;">
-				<view class="listView_item">
+				<view class="listView_item" @click="studyRecord()">
 					<image class="icon1" src="../../static/image/mine/myquest@2x.png" mode=""></image>
 					<view class="title">学习记录</view>
 					<image class="more" src="../../static/image/mine/cerarrow@2x.png" mode=""></image>
 				</view>
-				<view class="listView_item">
+				<view class="listView_item" @click="watchRecord()">
 					<image class="icon1" src="../../static/image/mine/watchRecord@2x.png" mode=""></image>
 					<view class="title">观看记录</view>
 					<image class="more" src="../../static/image/mine/cerarrow@2x.png" mode=""></image>
@@ -101,15 +101,23 @@
 					}
 				})
 			},
-			login() {
-				uni.navigateTo({
-					url: './login',
-					success: res => {
-						console.log("navitologin")
-					},
-					fail: () => {},
-					complete: () => {}
-				});
+			login() { 
+				var loginkey = uni.getStorageSync('loginKey');
+				if(loginkey.length>0){
+					uni.navigateTo({
+						url:'./setting'
+					})
+				}else{
+					uni.navigateTo({
+						url: './login',
+						success: res => {
+							console.log("navitologin")
+						}
+					});
+					
+				}
+				
+				
 
 			},
 				
@@ -154,6 +162,40 @@
 							url:'./login'
 						})
 					}
+			},
+			
+				
+			watchRecord(){
+				var loginkey = uni.getStorageSync('loginKey');
+				console.log("loginkey =" +loginkey );
+				if(loginkey){
+				   uni.navigateTo({
+				   	url:'./watchRecord/watchRecord',
+					success() {
+						
+					}
+				   })
+				}else{
+					uni.navigateTo({
+						url:'./login'
+					})
+				}
+			},
+			studyRecord(){
+				var loginkey = uni.getStorageSync('loginKey');
+				console.log("loginkey =" +loginkey );
+				if(loginkey){
+				   uni.navigateTo({
+				   	url:'./studyRecord/studyRecord',
+					success() {
+						
+					}
+				   })
+				}else{
+					uni.navigateTo({
+						url:'./login'
+					})
+				}
 			}
 			
 		
