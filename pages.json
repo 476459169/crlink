@@ -118,7 +118,13 @@
 				"enablePullDownRefresh": true  ,
 				"backgroundTextStyle": "dark"
 			}
-        }
+        },
+		{
+		    "path" : "pages/mine/myCertificate",
+		    "style" : {
+				"navigationBarTitleText": "我的证书"
+			}
+		}
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

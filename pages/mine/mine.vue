@@ -35,7 +35,7 @@
 				</view>
 			</view>
 			<view style="margin-top: 20upx;">
-				<view class="listView_item">
+				<view class="listView_item" @click="myCert()">
 					<image class="icon1" src="../../static/image/mine/cername@2x.png" mode=""></image>
 					<view class="title">我的证书</view>
 					<image class="more" src="../../static/image/mine/cerarrow@2x.png" mode=""></image>
@@ -187,6 +187,25 @@
 				if(loginkey){
 				   uni.navigateTo({
 				   	url:'./studyRecord/studyRecord',
+					success() {
+						
+					}
+				   })
+				}else{
+					uni.navigateTo({
+						url:'./login'
+					})
+				}
+			},
+			
+				
+			myCert(){
+				
+				var loginkey = uni.getStorageSync('loginKey');
+				console.log("loginkey =" +loginkey );
+				if(loginkey){
+				   uni.navigateTo({
+				   	url:'./myCertificate',
 					success() {
 						
 					}
