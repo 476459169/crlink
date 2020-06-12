@@ -38,7 +38,7 @@
 						{{item.name}}
 					</view>
 					<view style="color: #666666; font-size: 16px;">
-						包含：{{item.courseCount}}节
+						{{item.flag=="course"?'讲师：'+item.teacherName:'包含：'+item.courseCount}}
 					</view>
 					<view style="display: flex;">
 						<view class="text_money">
@@ -50,6 +50,10 @@
 					</view>
 
 				</view>
+			</view>
+			
+			<view v-if="listArr.length==0" class="none_showView">
+				<image class="show_image" src="../../../static/image/myCertif/nodata@2x.png" mode=""></image>
 			</view>
 		</view>
 
@@ -86,23 +90,23 @@
 		},
 		onPullDownRefresh: function() {
 			this.pages = 1;
-			this.getMianData(this.pages) 
+			this.getMianData(this.pages)
 
 		},
 
 		onReachBottom: function() { //当划到最底部的时候触发事件
-			 if (timer != null) { //加载缓冲延迟
-			 	clearTimeout(timer);
-			 }
-			 timer = setTimeout(function() {
-			 	_this.getMianData(_this.pages);
-			 }, 600); 
+			if (timer != null) { //加载缓冲延迟
+				clearTimeout(timer);
+			}
+			timer = setTimeout(function() {
+				_this.getMianData(_this.pages);
+			}, 600);
 		},
 
 		methods: {
 
 			getMianData(pages) {
-				
+
 				uni.showNavigationBarLoading();
 				var loginkey = uni.getStorageSync('loginKey');
 				this.$api.post('index!ajaxQueryCollege.action', {
@@ -110,31 +114,31 @@
 					selCourseCondition: _this.selCourseConditionId,
 					typeId: _this.lbTypeId,
 					loginKey: loginkey,
-					queryWord:_this.searchValue
+					queryWord: _this.searchValue
 				}).then(res => {
 					if (res.res.status == 0) {
 
 						if (pages == 1) {
 							_this.listArr = res.inf.arr
 							_this.pages++;
-						}else{
+						} else {
 							if (pages <= res.inf.pageCount) {
 								_this.listArr = _this.listArr.concat(res.inf.arr); //进行数据的累加
 								_this.pages++; //页数的++
 								_this.loading = "加载更多";
-								}else{
-									uni.showToast({
-										title:"没有更多了···"
-									})
-								}
+							} else {
+								uni.showToast({
+									title: "没有更多了···"
+								})
+							}
 						}
-						
+
 					} else {
 						uni.showToast({
 							title: res.res.errMsg
 						})
 					}
-					
+
 					uni.hideNavigationBarLoading();
 					uni.stopPullDownRefresh(); //数据加载完成,刷新结束
 				})
@@ -157,10 +161,13 @@
 				this.$api.post('index!ajaxGetCourseType.action', {
 					platform: "ios"
 				}).then(res => {
-						if (res.res.status == 0) {
+					if (res.res.status == 0) {
 
 						_this.lbArr = res.inf.arr;
-						_this.lbArr.unshift({id:"",title:"所有类别"})
+						_this.lbArr.unshift({
+							id: "",
+							title: "所有类别"
+						})
 
 					} else {
 						uni.showToast({
@@ -168,63 +175,63 @@
 						})
 					}
 				})
-		},
+			},
 
-		search() {
-			_this.pages=1
-			_this.getMianData(_this.pages)
-		},
-		itemClick(item) {
-			if	(item.flag =="college"){
-				uni.navigateTo({
-					url:'../college?collegeId='+item.id
-				})
-			}else{
-				uni.navigateTo({
-					url:'../videoDetail?courseID='+item.id
-				})
-			}
-			
-		},
-
-		upDownItemClick(item) {
-
-			if (item.name) {
-				if(item.name!==_this.couserStr){
-					_this.couserStr = item.name
-					_this.selCourseConditionId = item.key
-					_this.pages = 1;
+			search() {
+				_this.pages = 1
+				_this.getMianData(_this.pages)
+			},
+			itemClick(item) {
+				if (item.flag == "college") {
+					uni.navigateTo({
+						url: '../college?collegeId=' + item.id
+					})
+				} else {
+					uni.navigateTo({
+						url: '../videoDetail?courseID=' + item.id
+					})
 				}
-				
-			} else {
-				if(item.title!==_this.lbStr){
-				_this.lbStr = item.title
-				_this.lbTypeId = item.id
-					_this.pages = 1;
-				}
-			}
-			
-			
-			_this.selectArr = []
-			_this.typeSelectInedx = 0
-			_this.listShow = false
-			
-			_this.getMianData(1)
-			
-		},
 
-		typeClick(e) {
-			if (_this.typeSelectInedx !== e) {
-				_this.selectArr = e == 1 ? _this.couserArr : _this.lbArr
-				_this.listShow = true
-				_this.typeSelectInedx = e;
-			} else {
+			},
+
+			upDownItemClick(item) {
+
+				if (item.name) {
+					if (item.name !== _this.couserStr) {
+						_this.couserStr = item.name
+						_this.selCourseConditionId = item.key
+						_this.pages = 1;
+					}
+
+				} else {
+					if (item.title !== _this.lbStr) {
+						_this.lbStr = item.title
+						_this.lbTypeId = item.id
+						_this.pages = 1;
+					}
+				}
+
+
 				_this.selectArr = []
+				_this.typeSelectInedx = 0
 				_this.listShow = false
-				_this.typeSelectInedx = 0;
+
+				_this.getMianData(1)
+
+			},
+
+			typeClick(e) {
+				if (_this.typeSelectInedx !== e) {
+					_this.selectArr = e == 1 ? _this.couserArr : _this.lbArr
+					_this.listShow = true
+					_this.typeSelectInedx = e;
+				} else {
+					_this.selectArr = []
+					_this.listShow = false
+					_this.typeSelectInedx = 0;
+				}
 			}
 		}
-	}
 	}
 </script>
 
@@ -327,6 +334,7 @@
 		width: 350upx;
 		height: 180upx;
 	}
+
 	.text_money {
 		color: #e8654b;
 		font-size: 16px;
@@ -362,6 +370,20 @@
 
 		.upDownText {
 			color: #e8654b;
+		}
+	}
+	
+	.none_showView {
+	
+		width: 100%;
+		height: calc(90vh);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	
+		.show_image {
+			width: 150px;
+			height: 150px;
 		}
 	}
 </style>

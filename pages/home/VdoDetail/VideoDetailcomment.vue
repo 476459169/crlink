@@ -28,7 +28,7 @@
 		<view style="width: 100%;height: 10px;background-color: #eceff3;"></view>
 		<view class="bottomTitle">
 			<text style="color: #000000;font-size: 14px;margin-left: 5px;">好评率：</text>
-			<text style="color: #000000;font-size: 17px;color: #e8654b;">4.7</text>
+			<text style="color: #000000;font-size: 17px;color: #e8654b;">{{dataArr.praiseRatio}}</text>
 			<text style="color: #666666;font-size: 14px;margin-left: 5px;">({{dataArr.length}}人评价)</text>
 		</view>
 		<view class="tableView" v-for="(item,index) in dataArr" :key="index">
@@ -53,6 +53,7 @@
 		data() {
 			return {
 				couserID: '',
+				collegeId:'',
 				startArr: [1, 2, 3, 4, 5],
 				selectStartIndex: 0,
 				textValue:'',
@@ -63,7 +64,10 @@
 		onLoad(e) {
 			_this = this;
 			this.couserID = e.courseID
-			this.getCommitData();
+			this.collegeId = e.collegeId
+		
+				this.getCommitData();
+			
 		},
 		methods: {
 				
@@ -71,10 +75,16 @@
 				this.selectStartIndex = index
 			},
 			getCommitData(){
+				
+				
 				// live!ajaxGetCourseComment.action
+				let url =  'live!ajaxGetCourseComment.action'
+				if(this.collegeId){
+					url = 'college!ajaxGetCollegeComment.action'
+					}
 				var loginkey = uni.getStorageSync('loginKey');
-				this.$api.post('live!ajaxGetCourseComment.action', {
-					id: _this.couserID,
+				this.$api.post(url, {
+					id: _this.couserID?_this.couserID:_this.collegeId,
 					loginKey: loginkey,
 				}).then(res => {
 					if (res.res.status == 0) {
@@ -91,9 +101,15 @@
 			addComment(){
 				var loginkey = uni.getStorageSync('loginKey');
 				var selectStartn = _this.selectStartIndex+1;
-				this.$api.post('live!ajaxAddCourseComment.action', {
+				
+				
+				let url = 'live!ajaxAddCourseComment.action'
+				if(this.collegeId){
+					url = 'college!ajaxAddCollegeComment.action'
+				}
+				this.$api.post(url, {
 					
-					id: _this.couserID,
+					id: _this.couserID?_this.couserID:_this.collegeId,
 					loginKey: loginkey,
 					detail:	_this.textValue,
 					score:selectStartn

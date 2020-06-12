@@ -31,11 +31,11 @@
 			<view class="itemView_content" @click="telClcik()">{{userInfo.tel}} ⟩</view>
 		</view>
 		<view class="line"></view>
-		<view class="flex_view itemView">
+		<!-- <view class="flex_view itemView">
 			<image src="../../static/image/mine/cerPerson@3x.png" mode=""></image>
 			<view class="itemView_title">个人资料</view>
 			<view class="itemView_content">完成度 50% ⟩</view>
-		</view>
+		</view> -->
 
 
 		<view class="bottomBtn" @click="upNewUserMsg()">

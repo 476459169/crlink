@@ -27,9 +27,15 @@
 				</view>
 
 				<image class="list_xx" src="../../static/image/myCertif/xx.png" mode=""></image>
-				<image class="list_jj" v-if="index==1" src="../../static/image/myCertif/xj.png" mode=""></image>
+				<image class="list_jj" v-if="index==0" src="../../static/image/myCertif/xj.png" mode=""></image>
+			</view>
+			
+			<view v-if="dataArr.length==0" class="none_showView">
+				<image class="show_image" src="../../static/image/myCertif/nodata@2x.png" mode=""></image>
 			</view>
 		</view>
+		
+	
 
 		<view class="bottom_z2">
 			<image src="../../static/image/myCertif/fm.png" mode=""></image>
@@ -69,7 +75,9 @@
 			},
 			
 			itemClick(item){
-				
+				uni.navigateTo({
+					url:'./myCertDetail?id='+item.id
+				})
 			}
 		}
 
@@ -159,12 +167,26 @@
 		}
 		
 		.list_jj{
-			position: fixed;
-			right: 20px;
-			top: 20px;
+			position: absolute;
+			right: 0px;
+			top: -1px;
 			width: 30px;
 			height: 20px;
 		}
 
+	}
+	
+	.none_showView {
+	
+		width: calc(90vw);
+		height: calc(90vh);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	
+		.show_image {
+			width: 150px;
+			height: 150px;
+		}
 	}
 </style>

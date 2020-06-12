@@ -41,7 +41,7 @@
 							 mode="" @click="likeClick()"></image>
 							<image v-else-if="myData.isCollect==1" class="showMessage_bottomImg" src="../../static/image/home/vdodetail/collection_o@2x.png"
 							 mode="" @click="likeClick()"></image>
-							<image class="showMessage_bottomImg" src="../../static/image/home/vdodetail/shareHui@2x.png" mode="" @click="shareClick()"></image>
+							<!-- <image class="showMessage_bottomImg" src="../../static/image/home/vdodetail/shareHui@2x.png" mode="" @click="shareClick()"></image> -->
 						</view>
 					</view>
 
@@ -126,7 +126,15 @@
 
 			<view class="" style="height: 45px;">
 				<view class="fixedBottom">
-					<view v-if="selectIndex==0 && myData.viewType !==0" class="buy_class">
+					
+					<view class="buy_class" v-if="myData.viewType ==0">
+						<view style="background-color: #e8654b;width: 50%;color: #FFFFFF; flex: 1;" >
+							<view style="width: 100%;text-align: center;font-size: 14px;line-height: 45px;padding: 0px 0px;">
+								已购买
+							</view>
+						</view>
+					</view>
+					<view v-else-if="selectIndex==0 && myData.viewType !==0" class="buy_class">
 						<view style="background-color: #e8654b;width: 50%;color: #FFFFFF; flex: 1;" @click="tobuy()">
 							<view style="width: 100%;text-align: center;font-size: 14px;line-height: 22.5px;padding: 0px 0px;">
 								{{myData.isBuy==1?'已购买':'单独购买'}}
@@ -207,8 +215,12 @@
 			_this = this;
 			this.couserID = e.courseID;
 			this.collegeId = e.collegeId;
-			this.getNetMessage();
-			this.getQues(this.page);
+			
+		},
+		
+		onShow() {
+		this.getNetMessage();
+		this.getQues(this.page);
 		},
 		onHide() {
 			this.uploadVideoPlayTime('NO')
@@ -217,7 +229,9 @@
 		onUnload() {
 			this.uploadVideoPlayTime('NO')
 		},
-		onShow() {},
+	
+		
+		
 		computed: {
 
 
@@ -518,9 +532,13 @@
 			
 			//跳转购买
 			tobuy(){
-				uni.navigateTo({
-					url:'./payView/payView?courseId='+_this.couserID,
-				})
+				
+				if(this.myData.isBuy == 0){
+					uni.navigateTo({
+						url:'./payView/payView?courseId='+_this.couserID,
+					})
+				}
+			
 			},
 
 

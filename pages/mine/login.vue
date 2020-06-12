@@ -13,24 +13,25 @@
 			</view>
 			<view class="line"></view>
 
-			<view style="margin-top: 100upx;">
-				<view class="logbtn" @click="login">登 录</view>
+			<view style="margin-top: 100upx;"> 
+				<button class="logbtn" @click="login()">登 录</button>
 			</view>
 			<view style="margin-top: 20upx;">
-				<view class="logbtn" @click="wxlogin">微信快捷登录</view>
-			</view>
-
-			<view style="margin-top: 20upx;">
-				<view class="registbtn" v-on:click="jumpToRegist">新用户？点击这里注册</view>
-			</view>
-
+				<button class="logbtn" type="primary" open-type="getUserInfo" @getuserinfo="bindGetUserInfo">微信登录</button>
 		</view>
+
+		<view style="margin-top: 20upx;">
+			<view class="registbtn" v-on:click="jumpToRegist">新用户？点击这里注册</view>
+		</view>
+
+	</view>
 
 
 	</view>
 </template>
 
 <script>
+	var self;
 	export default {
 
 		data() {
@@ -38,12 +39,30 @@
 				phoneNum: null,
 				VerificationCode: null,
 				VerificationMes: "获取验证码",
-				disabled: false
+				disabled: false,
+				loginInfo: Object,
+				scope: 0
 			}
 		},
 
 
-
+		onLoad() {
+			self = this;
+			uni.getSetting({
+				success(res) {
+					console.log("授权：", res);
+					if (!res.authSetting['scope.userInfo']) {
+						//这里调用授权
+						console.log("当前未授权");
+						self.scope = 0
+					} else {
+						//用户已经授权过了
+						console.log("当前已授权");
+						self.scope = 1
+					}
+				}
+			})
+		},
 		methods: {
 
 			jumpToRegist() {
@@ -103,7 +122,7 @@
 						if (res.res.status == 0) {
 							var dict = res.inf;
 							console.log(dict);
-							  uni.setStorageSync('userId', dict.userId);
+							uni.setStorageSync('userId', dict.userId);
 							uni.setStorage({
 								key: "loginKey",
 								data: dict.loginKey,
@@ -128,10 +147,59 @@
 				}
 
 			},
+			bindGetUserInfo() {
+				let that = this
+				uni.login({
+					provider: 'weixin',
+					success: function(loginRes) {
+						console.log(loginRes);
+						let code = loginRes.code;
 
-			wxlogin() {
-				//微信登录需要后台配合，暂时跳过
-			}
+						uni.getUserInfo({
+							provider: 'weixin',
+							success: function(infoRes) {
+								console.log(infoRes)
+								console.log('用户昵称为：' + infoRes.userInfo.nickName);
+								var data = {
+									code: code,
+									encryptedData: infoRes.encryptedData,
+									iv: infoRes.iv,
+									rawData: infoRes.rawData,
+									signature: infoRes.signature,
+								};
+
+								that.$api.post('login!ajaxLoginByJSAPI.action', data).then(res => {
+									if (res.res.status == 0) {
+										console.log("loginres =" +res);
+										
+										if(res.inf.isFill==0){
+											uni.setStorage({
+												key: "loginKey",
+												data: res.inf.loginKey,
+												success() {
+													uni.showToast({
+														title: '微信登录中···'
+													});
+													setTimeout(function() {
+														uni.navigateTo({
+															url:'./bindPhoneNumb'
+														})
+													}, 1000)
+												}
+											})
+											
+										}
+										
+									}
+
+								})
+
+							}
+						})
+					}
+				})
+			},
+
 		}
 	}
 </script>
@@ -165,16 +233,18 @@
 			color: #666666;
 
 		}
+ 
 		.yz {
 			color: #fd6666;
 			font-size: 24upx;
 			padding-right: 5%;
-			border: none;;
+			border: none;
+			;
 		}
 
 	}
 
-	
+
 
 	.line {
 		width: 90%;

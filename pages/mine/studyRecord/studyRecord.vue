@@ -334,6 +334,7 @@
 		font-size: 13px;
 		text-align: center;
 		background-color: #FFFFFF;
+		padding: 5px 0px;
 
 		image {
 			padding: 10px 5px 10px 10px;

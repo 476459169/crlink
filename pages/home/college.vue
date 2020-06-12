@@ -1,7 +1,7 @@
 <template>
 	<view class="">
-		
-		
+
+
 		<view class="topview">
 			<image :src="baseurl+myDataDic.imgUrl" mode="scaleToFill"></image>
 		</view>
@@ -30,9 +30,13 @@
 					<image class="showMesage_watch" src="../../static/image/home/vdodetail/watchCount@2x.png" mode=""></image>
 					<view class="showMessage_watchNum">{{myDataDic.viewNum}}</view>
 					<view class="" style="margin-right: 20rpx;display: flex;align-items: center;">
-						<image class="showMessage_bottomImg" src="../../static/image/home/vdodetail/comments@2x.png" mode=""></image>
-						<image class="showMessage_bottomImg" src="../../static/image/home/vdodetail/collection_g@2x.png" mode=""></image>
-						<image class="showMessage_bottomImg" src="../../static/image/home/vdodetail/shareHui@2x.png" mode=""></image>
+						<image class="showMessage_bottomImg" src="../../static/image/home/vdodetail/comments@2x.png" mode="" @click="comments()"></image>
+						<image v-if="myDataDic.isCollect==0" class="showMessage_bottomImg" src="../../static/image/home/vdodetail/collection_g@2x.png"
+						 mode="" @click="collection()"></image>
+						<image v-else-if="myDataDic.isCollect==1" class="showMessage_bottomImg" src="../../static/image/home/vdodetail/collection_o@2x.png"
+						 mode="" @click="collection()"></image>
+
+						<!-- <image class="showMessage_bottomImg" src="../../static/image/home/vdodetail/shareHui@2x.png" mode=""></image> -->
 					</view>
 				</view>
 
@@ -98,7 +102,7 @@
 				</view>
 			</view>
 		</view>
-		
+
 	</view>
 
 </template>
@@ -126,14 +130,19 @@
 			};
 		},
 
+		onShow() {
+			console.log('college show');
+			this.getListData()
+			this.getTeacherData() 
+		},
+
 		onLoad(e) {
 
 			//获取数据
 			_this = this;
 			_this.collegeId = e.collegeId;
+		
 
-			this.getListData()
-			this.getTeacherData()
 
 		},
 		mounted() {
@@ -178,25 +187,25 @@
 
 			didselectItem(item) {
 				uni.navigateTo({
-					url: './videoDetail?courseID=' + item.courseId+'&&collegeId='+this.collegeId,
-					success() { 
+					url: './videoDetail?courseID=' + item.courseId + '&&collegeId=' + this.collegeId,
+					success() {
 
 					}
 				})
 			},
-			
+
 			//跳转购买页面
-			tobuy(){
-				if (_this.myDataDic.isBuy!==1){
+			tobuy() {
+				if (_this.myDataDic.isBuy !== 1) {
 					uni.navigateTo({
-						url:'./payView/payView?collegeId='+_this.collegeId,
+						url: './payView/payView?collegeId=' + _this.collegeId,
 						success() {
-							
+
 						}
 					})
 				}
 
-				
+
 			},
 			//顶部选项卡选择
 			topItemSelect(e) {
@@ -214,17 +223,40 @@
 						that.navbarInitTop = navbarInitTop
 					}
 				}).exec();
+			},
+
+			comments() {
+				//评价
+				uni.navigateTo({
+					url: './VdoDetail/VideoDetailcomment?collegeId=' + this.collegeId
+				})
+			},
+
+			collection() {
+				var loginkey = uni.getStorageSync('loginKey');
+				this.$api.post('college!ajaxCollectCollege.action', {
+					id: _this.collegeId,
+					loginKey: loginkey
+				}).then(res => {
+					if (res.res.status == 0) {
+						_this.myDataDic.isCollect = res.inf.isColl == 1 ? 0 : 1
+
+						uni.showToast({
+							title: res.inf.isColl == 1 ? '取消收藏' : '收藏成功',
+							duration: 500
+						})
+					} else {
+						uni.showToast({
+							title: res.res.errMsg
+						})
+					}
+				})
 			}
 
 
 
 		},
-		/**
-		 * 生命周期函数--监听页面显示
-		 */
-		onShow: function() {
-
-		},
+		
 
 		/**
 		 * 监听页面滑动事件

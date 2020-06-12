@@ -16,9 +16,15 @@
 		</view>
 		<view class="listView">
 			<view class="">
-				<view class="listView_item" style="margin-top: 0upx;">
+				<view class="listView_item" style="margin-top: 0upx;" @click="myCourse()">
 					<image class="icon1" src="../../static/image/mine/buyCourse@2x.png" mode=""></image>
-					<view class="title">已购买课程</view>
+					<view class="title">我的课程</view>
+					<image class="more" src="../../static/image/mine/cerarrow@2x.png" mode=""></image>
+				</view>
+				<view class="line"></view> 
+				<view class="listView_item" style="margin-top: 0upx;" @click="myColle()">
+					<image class="icon1" src="../../static/image/mine/buyCourse@2x.png" mode=""></image>
+					<view class="title">我的收藏</view>
 					<image class="more" src="../../static/image/mine/cerarrow@2x.png" mode=""></image>
 				</view>
 			</view>
@@ -27,7 +33,8 @@
 					<image class="icon1" src="../../static/image/mine/myquest@2x.png" mode=""></image>
 					<view class="title">学习记录</view>
 					<image class="more" src="../../static/image/mine/cerarrow@2x.png" mode=""></image>
-				</view>
+				</view> 
+				<view class="line"></view>
 				<view class="listView_item" @click="watchRecord()">
 					<image class="icon1" src="../../static/image/mine/watchRecord@2x.png" mode=""></image>
 					<view class="title">观看记录</view>
@@ -44,7 +51,7 @@
 			</view>
 
 			<view style="margin-top: 20upx;">
-				<view class="listView_item">
+				<view class="listView_item" @click="aboutUs()">
 					<image class="icon1" src="../../static/image/mine/teacherCreditworthiness@2x.png" mode=""></image>
 					<view class="title">关于我们</view>
 					<image class="more" src="../../static/image/mine/cerarrow@2x.png" mode=""></image>
@@ -73,7 +80,7 @@
 	export default {
 		data() {
 			return {
-				islogin:false,
+				islogin:false, 
 				userInfo:Object,
 				baseUrl:"http://39.105.48.243:8080/crlink/"
 			}
@@ -85,11 +92,22 @@
 		onShow() {
 			this.getuserInfo()
 		},
+		onPullDownRefresh: function() {
+		uni.hideNavigationBarLoading();
+		uni.stopPullDownRefresh(); //数据加载完成,刷新结束
+			
+		},
+		
+		onReachBottom: function() { //当划到最底部的时候触发事件
+			uni.hideNavigationBarLoading();
+			uni.stopPullDownRefresh(); //数据加载完成,刷新结束
+		},
 		methods: {
 			
 			getuserInfo(){
 				var that = this;
 				var loginkey = uni.getStorageSync('loginKey');
+				
 				this.$api.post('user!ajaxGetUserInfo.action',{loginKey:loginkey}).then(res => {
 					if (res.res.status == 0) {
 						that.userInfo = res.inf
@@ -215,6 +233,55 @@
 						url:'./login'
 					})
 				}
+			},
+			aboutUs(){
+				var loginkey = uni.getStorageSync('loginKey');
+				console.log("loginkey =" +loginkey );
+				if(loginkey){
+				   uni.navigateTo({
+				   	url:'./aboutUs/aboutUs',
+					success() {
+						
+					}
+				   })
+				}else{
+					uni.navigateTo({
+						url:'./login'
+					})
+				}
+			},
+			myCourse(){
+				var loginkey = uni.getStorageSync('loginKey');
+				console.log("loginkey =" +loginkey );
+				if(loginkey){
+				   uni.navigateTo({
+				   	url:'./myCourse/myCourse',
+					success() {
+						
+					}
+				   })
+				}else{
+					uni.navigateTo({
+						url:'./login'
+					})
+				}
+			},
+			
+			myColle(){
+				var loginkey = uni.getStorageSync('loginKey');
+				console.log("loginkey =" +loginkey );
+				if(loginkey){
+				   uni.navigateTo({
+				   	url:'./myCourse/myCollection',
+					success() { 
+						
+					}
+				   })
+				}else{
+					uni.navigateTo({
+						url:'./login'
+					})
+				}
 			}
 			
 		
@@ -315,5 +382,11 @@
 			height: 30upx;
 			width: 15upx;
 		}
+	}
+	
+	.line{
+		margin: 0px 10px;
+		height: 1px;
+		background-color: #e6e6e6;
 	}
 </style>

@@ -85,53 +85,102 @@
 			},
 			topay() {
 
-				if (_this.courseId) {
-					console.log("danke");
-					//单课支付
-					var loginkey = uni.getStorageSync('loginKey');
+				let that = this
+				var openId;
+				uni.login({
+					provider: 'weixin',
+					success: function(loginRes) {
+						console.log('loginRes=' + loginRes.code);
+						let code = loginRes.code;
 
-					uni.request({
-						url: 'http://39.105.48.243:8080/crlink/pay/wxPay!ajaxBuyCourse.action',
-						data: {
-							id: _this.courseId,
-							loginKey: loginkey,
-							tradeType:'JSAPI'
-						},
-						success: (res) => {
-							console.log(res.data);
-							_this.wxpay(res.data.inf)
-						}
-					})
-				} else {
-					//课程支付
-					console.log("kecheng");
-					var loginkey = uni.getStorageSync('loginKey');
-					uni.request({
-						url: 'http://39.105.48.243:8080/crlink/pay/wxPay!ajaxBuyCourseCollege.action',
-						data: {
-							id: _this.courseId,
-							loginKey: loginkey,
-							tradeType:'JSAPI' 
-						},
-						success: (res) => {
-							_this.wxpay(res.data.inf)
-						}
-					})
-				}
+						
+						uni.request({
+							url: 'http://39.105.48.243:8080/crlink/pay/wxPay!ajaxGetOpenId.action',
+							data: {
+								code:code
+							},
+							success: (res) => {
+								
+								console.log('openid = '+ res.data.inf.openid);
+								let  openId = res.data.inf.openid
+								if (res.data.res.status == 0) {
+									if (_this.courseId) {
+										//单课支付
+										var loginkey = uni.getStorageSync('loginKey');
+										
+										uni.request({
+											url: 'http://39.105.48.243:8080/crlink/pay/wxPay!ajaxBuyCourse.action',
+											data: {
+												id: _this.courseId?_this.courseId:_this.collegeId,
+												loginKey: loginkey,
+												tradeType: 'JSAPI',
+												openId: openId
+											},
+											success: (res) => {
+												console.log("ajaxBuyCourse"+res.data);
+												_this.wxpay(res.data.inf)
+											}
+										})
+									} else {
+										//课程支付
+										console.log("kecheng");
+										var loginkey = uni.getStorageSync('loginKey');
+									
+										uni.request({
+											url: 'http://39.105.48.243:8080/crlink/pay/wxPay!ajaxBuyCourseCollege.action',
+											data: {
+												id: _this.courseId?_this.courseId:_this.collegeId,
+												loginKey: loginkey,
+												tradeType: 'JSAPI',
+												openId: openId
+											},
+											success: (res) => {
+												_this.wxpay(res.data.inf)
+											}
+										})
+									}
+									
+								}
+							}
+						})
+						
+						// that.$api.post('', {
+							
+						// 	code: code
+						// }).then(res => {
+							
+						// })
+
+
+
+					}
+				})
+
+
 			},
 
 			wxpay(dict) {
-				
-					console.log("dict timestamp= "+dict.timestamp);
+
+				console.log("dict timestamp= " + dict.timeStamp);
 				uni.requestPayment({
 					provider: 'wxpay',
-					timeStamp: dict.timestamp,
+					timeStamp: dict.timeStamp,
 					nonceStr: dict.nonceStr,
-					package: 'prepay_id='+dict.prepayId,
+					package: dict.package,
 					signType: 'MD5',
-					paySign: dict.paySign,
+					paySign: dict.paySign, 
 					success: function(res) {
-						console.log('success:' + JSON.stringify(res));
+						console.log('success:000' + JSON.stringify(res));
+						uni.showToast({
+							title:"购买成功",
+							duration:1000,
+							complete() {
+								uni.navigateBack({
+									delta:1,
+								})
+							}
+						})
+						
 					},
 					fail: function(err) {
 						console.log('fail:' + JSON.stringify(err));
