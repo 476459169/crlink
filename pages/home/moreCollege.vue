@@ -36,6 +36,7 @@
 		onLoad(e) {
 			_this = this;
 			this.id = e.id
+			this.baseUrl =  getApp().globalData.baseUrl
 			this.getMoreCollege()
 		},
 		

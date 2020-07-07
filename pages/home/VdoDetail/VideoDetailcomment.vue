@@ -63,6 +63,7 @@
 		},
 		onLoad(e) {
 			_this = this;
+			this.baseUrl =  getApp().globalData.baseUrl
 			this.couserID = e.courseID
 			this.collegeId = e.collegeId
 		

@@ -41,6 +41,7 @@
 		},
 		onLoad(e) {
 			_this = this;
+			this.baseUrl =  getApp().globalData.baseUrl
 			_this.collegeId = e.collegeId
 			_this.courseId = e.courseId
 
@@ -95,7 +96,7 @@
 
 						
 						uni.request({
-							url: 'http://39.105.48.243:8080/crlink/pay/wxPay!ajaxGetOpenId.action',
+							url: _this.baseUrl+'pay/wxPay!ajaxGetOpenId.action',
 							data: {
 								code:code
 							},
@@ -109,7 +110,7 @@
 										var loginkey = uni.getStorageSync('loginKey');
 										
 										uni.request({
-											url: 'http://39.105.48.243:8080/crlink/pay/wxPay!ajaxBuyCourse.action',
+											url: _this.baseUrl+'pay/wxPay!ajaxBuyCourse.action',
 											data: {
 												id: _this.courseId?_this.courseId:_this.collegeId,
 												loginKey: loginkey,
@@ -127,7 +128,7 @@
 										var loginkey = uni.getStorageSync('loginKey');
 									
 										uni.request({
-											url: 'http://39.105.48.243:8080/crlink/pay/wxPay!ajaxBuyCourseCollege.action',
+											url: _this.baseUrl+'pay/wxPay!ajaxBuyCourseCollege.action',
 											data: {
 												id: _this.courseId?_this.courseId:_this.collegeId,
 												loginKey: loginkey,

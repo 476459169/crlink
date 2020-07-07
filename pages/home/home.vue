@@ -1,8 +1,8 @@
 <template>
 	<view class="container">
 		<swiper :indicator-dots="true" :autoplay="true" indicator-active-color="#ee7b5e">
-			<swiper-item v-for="(item, index) in banner" :key="index">
-				<image class="swiper-item" :src="'http://api.crlink.com/'+item.imgUrl" mode="widthFix"></image>
+			<swiper-item v-for="(item, index) in banner" :key="index"  @click="bannarClick(item,index)" >
+				<image class="swiper-item" :src="baseUrl+item.imgUrl" mode="widthFix"></image>
 			</swiper-item>
 		</swiper>
 		<view class="navbar">
@@ -14,7 +14,7 @@
 				<image class="thumb" src="../../static/image/home/find.png" mode="aspectFit"></image>
 				<view class="title">证书查询</view>
 			</view>
-			<view class="navbar-item">
+			<view class="navbar-item" @click="testClick()">
 				<image class="thumb" src="../../static/image/home/exam.png" mode="aspectFit"></image>
 				<view class="title">考 试</view>
 			</view>
@@ -28,7 +28,7 @@
 			</view> 
 			<view class="panel__bd">
 				<view class="course" v-for="(item, index) in course" :key="index" @click="itemClcik(item)">
-					<image :src="baseurl+item.collegeImgUrl" class="itemImage"></image>
+					<image :src="baseUrl+item.collegeImgUrl" class="itemImage"></image>
 					<view class="itemContent">  
 						<view style="font-size: 17px;"> 
 							{{item.collegeName}}  
@@ -62,7 +62,7 @@
 				course: [],
   
 				page: 1,
-				baseurl: "http://39.105.48.243:8080/crlink/"
+				baseUrl: "https://uat.crlink.com/crlink/"
 			} 
 		},
 
@@ -70,9 +70,10 @@
 	
 		onLoad() {
 			_this = this
+			_this.baseUrl =  getApp().globalData.baseUrl
+			console.log("baseUrl11 = "+_this.baseUrl);
 			this.getAdImage()
 			this.getIndexCourse(this.page)
-
 		},
 		onShow() {
 			this.getuserInfo()
@@ -90,7 +91,7 @@
 			}
 			timer = setTimeout(function() {
 				_this.getIndexCourse(_this.page); 
-			}, 600);
+			}, 600); 
 		},
 		methods: {
   
@@ -105,6 +106,7 @@
 					} else {
 						uni.removeStorageSync('loginKey');
 						uni.removeStorageSync('userId');
+						uni.removeStorageSync('isFill')
 					}
 				})
 			},
@@ -142,6 +144,56 @@
 					uni.hideNavigationBarLoading();
 					uni.stopPullDownRefresh(); //数据加载完成,刷新结束
 				})
+			},
+			
+		
+			bannarClick(item,index){
+				
+				if(item.tag == 'college'){
+					var loginkey = uni.getStorageSync('loginKey');
+					if (loginkey.length > 0) {
+						uni.navigateTo({
+							url: './college?collegeId=' + item.correspondId,
+							success() {
+							}
+						})
+					} else {
+						uni.navigateTo({
+							url: '../mine/login',
+							success() {
+					
+							} 
+						})
+					}
+				}else if(item.tag == 'course'){
+					var loginkey = uni.getStorageSync('loginKey');
+					if (loginkey.length > 0) {
+						uni.navigateTo({
+							url: './videoDetail?courseID=' + item.correspondId
+						})
+					} else {
+						uni.navigateTo({
+							url: '../mine/login',
+							success() {
+					
+							} 
+						})
+					}
+				}else if(item.tag == 'ad'){
+					var loginkey = uni.getStorageSync('loginKey');
+					if (loginkey.length > 0) {
+						uni.navigateTo({
+							url: './bigImage?imgUrl='+item.correspondUrl//'./gi=' + item.correspondId
+						})
+					} else {
+						uni.navigateTo({
+							url: '../mine/login',
+							success() {
+					
+							} 
+						})
+					}
+				}
 			},
 
 			cousersClick() {
@@ -190,7 +242,27 @@
 				uni.navigateTo({
 					url: './certSeach'
 				})
+			},
+			
+			testClick(){
+				var loginkey = uni.getStorageSync('loginKey');
+				if (loginkey.length > 0) {
+					uni.navigateTo({
+						url: './test/test',
+						success() {
+				
+						}
+					})
+				} else {
+					uni.navigateTo({
+						url: '../mine/login', 
+						success() {
+				
+						} 
+					})
+				}
 			}
+			
 		}
 	}
 </script>

@@ -82,10 +82,11 @@
 			return {
 				islogin:false, 
 				userInfo:Object,
-				baseUrl:"http://39.105.48.243:8080/crlink/"
+				baseUrl:"https://uat.crlink.com/crlink/"
 			}
 		},
 		onLoad() {
+			this.baseUrl =  getApp().globalData.baseUrl
 			console.log("onload")
 			
 		},
@@ -116,6 +117,7 @@
 						that.islogin = false;
 						uni.removeStorageSync('loginKey');
 						uni.removeStorageSync('userId');
+						uni.removeStorageSync('isFill')
 					}
 				})
 			},
@@ -150,6 +152,8 @@
 				        if (res.confirm) {
 							
 							// uni.removeStorageaSync("loginKey");
+							uni.removeStorageSync('isFill')
+							uni.removeStorageSync('userId');
 							uni.removeStorage({
 								key:"loginKey",
 								success() {

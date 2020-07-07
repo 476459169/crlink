@@ -50,6 +50,7 @@
 		onLoad(e) {
 			self = this
 			self.id = e.id
+			self.baseUrl =  getApp().globalData.baseUrl
 			self.getData()
 		},
 		methods:{

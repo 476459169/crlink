@@ -71,6 +71,7 @@
 			}
 		},
 		onLoad(e) {
+			this.baseUrl =  getApp().globalData.baseUrl
 			this.id = e.id;
 			this.getNetDetail(this.id)
 		},

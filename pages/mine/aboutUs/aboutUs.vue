@@ -57,7 +57,7 @@
 				uni.showModal({
 					showCancel: false,
 					title: '联系我们',
-					content: '您可以通过拨打临语堂客服电话135-2180-9828联系我们，或通过发送电子邮件到linxiaomei@crlink.com,反馈您的意见和建议。\n\n客服工作时间：工作日 9:00 - 17:30',
+					content: '您可以通过拨打临语堂客服电话135-2180-9828联系我们，或通过发送电子邮件到linxiaomei@crlink.com,反馈您的意见和建议。',
 					confirmText: '好的',
 					success: function(res) {
 						if (res.confirm) {

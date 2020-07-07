@@ -31,8 +31,8 @@ http.delete('user/1').then((res)=>{
 */
 export default {
 	config: {
-		// baseUrl: "http://api.crlink.com/app/",
-		baseUrl: "http://39.105.48.243:8080/crlink/app/",
+		// baseUrl: "http://39.105.48.243/crlink/app/", 
+		baseUrl: "https://uat.crlink.com/crlink/app/",
 		header: {
 			'Content-Type':'application/json;charset=UTF-8',
 			'Content-Type':'application/x-www-form-urlencoded'

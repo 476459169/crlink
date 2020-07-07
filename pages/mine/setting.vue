@@ -58,6 +58,7 @@
 		},
 		onLoad() {
 			_this = this;
+			this.baseUrl =  getApp().globalData.baseUrl
 			this.getuserInfo()
 		},
 		onShow() {

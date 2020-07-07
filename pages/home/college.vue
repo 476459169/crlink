@@ -134,6 +134,7 @@
 			console.log('college show');
 			this.getListData()
 			this.getTeacherData() 
+			this.baseurl =  getApp().globalData.baseUrl
 		},
 
 		onLoad(e) {

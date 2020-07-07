@@ -13,9 +13,11 @@
 				</view>
 
 				<view class="scorl_item">
-					<view class="scorl_child_item" v-bind:class="itemSelect1" @click="itemSelect(0)">介绍</view>
-					<view class="scorl_child_item" v-bind:class="itemSelect2" @click="itemSelect(1)">提问</view>
-					<view class="scorl_child_item" v-bind:class="itemSelect3" @click="itemSelect(2)">测试</view>
+					
+					
+					<view class="scorl_child_item" v-bind:class="[selectIndex==0?'scorl_child_item_select':'']" @click="itemSelect(0)">介绍</view>
+					<view class="scorl_child_item" v-bind:class="[selectIndex==1?'scorl_child_item_select':'']" @click="itemSelect(1)">提问</view>
+					<view v-if="myData.isHasTest ==1" class="scorl_child_item" v-bind:class="[selectIndex==2?'scorl_child_item_select':'']" @click="itemSelect(2)">测试</view>
 				</view>
 				<view class="line"></view>
 			</view>
@@ -26,7 +28,7 @@
 					<view class="showMessage_title">{{myData.title}}</view>
 					<view class="showMessage_flexView">
 						<view class="showMessage_autor">讲师：{{myData.author}}</view>
-						<view class="showMessage_autor">有效期1年</view>
+						<view class="showMessage_autor">{{myData.expiredDuration.length>0?'有效期'+myData.expiredDuration:''}}</view>
 					</view>
 					<view class="showMessage_flexView">
 						<view class="showMessage_money">￥{{myData.buyPrice}}</view>
@@ -121,14 +123,33 @@
 				</view>
 			</view>
 
+
+			<view v-if="selectIndex==2" class="scorll_class">
+				<view class="test_item" v-for="(item,index) in testArr" :key="index">
+					<view class="test_flex">
+						<view class="test_text">
+							{{item.examName}}
+						</view>
+						<view class="test_btn" :class="[item.examScore.length>0?'':item.isCompleted == '1'?'test_btn_ok':'']">
+							{{item.examScore.length>0?item.examScore:'去测试'}}
+						</view>
+					</view>
+					<view class="line"></view>
+				</view>
+			</view>
+
 			<!-- </scroll-view> -->
 
 
 			<view class="" style="height: 45px;">
 				<view class="fixedBottom">
-					
-					<view class="buy_class" v-if="myData.viewType ==0">
-						<view style="background-color: #e8654b;width: 50%;color: #FFFFFF; flex: 1;" >
+
+
+					<view v-if="selectIndex==1" class="questions" @click="confirmDialog">
+						提问
+					</view>
+					<view class="buy_class" v-else-if="myData.viewType ==0">
+						<view style="background-color: #e8654b;width: 50%;color: #FFFFFF; flex: 1;">
 							<view style="width: 100%;text-align: center;font-size: 14px;line-height: 45px;padding: 0px 0px;">
 								已购买
 							</view>
@@ -147,9 +168,7 @@
 							查看所属学院
 						</view>
 					</view>
-					<view v-else-if="selectIndex==1" class="questions" @click="confirmDialog">
-						提问
-					</view>
+
 				</view>
 			</view>
 
@@ -208,6 +227,7 @@
 				playtime: '', //记录播放进度 39：20/50：20
 				seekTime: 0, //历史播放记录
 				iscollect: 0, //是否收藏
+				testArr: [], //测试数组
 			}
 		},
 
@@ -215,12 +235,14 @@
 			_this = this;
 			this.couserID = e.courseID;
 			this.collegeId = e.collegeId;
-			
+			this.baseUrl = getApp().globalData.baseUrl 
+
 		},
-		
+
 		onShow() {
-		this.getNetMessage();
-		this.getQues(this.page);
+			this.getNetMessage();
+			this.getQues(this.page);
+			this.getExamList()
 		},
 		onHide() {
 			this.uploadVideoPlayTime('NO')
@@ -229,9 +251,9 @@
 		onUnload() {
 			this.uploadVideoPlayTime('NO')
 		},
-	
-		
-		
+
+
+
 		computed: {
 
 
@@ -405,9 +427,9 @@
 						_this.page = 1;
 						_this.getQues(_this.page)
 					} else {
-						uni.showModal({
-							title: "提交失败"
-						})
+						// uni.showModal({
+						// 	title: "提交失败"
+						// })
 					}
 				})
 			},
@@ -474,9 +496,9 @@
 						console.log("zhihou=" + _this.replyItem.replyArr + _this.quesArr);
 
 					} else {
-						uni.showModal({
-							title: '提交失败'
-						})
+						// uni.showModal({
+						// 	title: '提交失败'
+						// })
 					}
 				})
 			},
@@ -495,8 +517,8 @@
 				var loginkey = uni.getStorageSync('loginKey');
 				this.$api.post('index!ajaxCollectCourse.action', {
 					loginKey: loginkey,
-					id: _this.couserID, 
- 
+					id: _this.couserID,
+
 				}).then(res => {
 
 					if (res.res.status == 0) {
@@ -512,39 +534,58 @@
 			shareClick() {
 				console.log("shareClick");
 				uni.share({
-					
-				    provider: 'weixin',
-				    scene: "WXSceneSession",
-				    type: 5,
-				    imageUrl: 'https://img-cdn-qiniu.dcloud.net.cn/uniapp/app/share-logo@3.png',
-				    title: '欢迎体验uniapp',
-				    miniProgram: {
-				        id: 'gh_19f4ac0477a4',
-				        path: 'pages/home/home',
-				        type: 0,
-				        webUrl: 'http://uniapp.dcloud.io'
-				    },
-				    success: ret => {
-				        console.log(JSON.stringify(ret));
-				    }
+
+					provider: 'weixin',
+					scene: "WXSceneSession",
+					type: 5,
+					imageUrl: 'https://img-cdn-qiniu.dcloud.net.cn/uniapp/app/share-logo@3.png',
+					title: '欢迎体验uniapp',
+					miniProgram: {
+						id: 'gh_19f4ac0477a4',
+						path: 'pages/home/home',
+						type: 0,
+						webUrl: 'http://uniapp.dcloud.io'
+					},
+					success: ret => {
+						console.log(JSON.stringify(ret));
+					}
 				});
 			},
-			
+
 			//跳转购买
-			tobuy(){
-				
-				if(this.myData.isBuy == 0){
+			tobuy() {
+
+				if (this.myData.isBuy == 0) {
 					uni.navigateTo({
-						url:'./payView/payView?courseId='+_this.couserID,
+						url: './payView/payView?courseId=' + _this.couserID,
 					})
 				}
-			
+
 			},
 
 
 			itemSelect: function(e) {
 				this.selectIndex = e
+				if (e == 2) {
+					this.getExamList()
+				}
 
+			},
+
+			getExamList() {
+				var loginkey = uni.getStorageSync('loginKey');
+				this.$api.post('college!ajaxGetCoursePartExamList.action', {
+					loginKey: loginkey,
+					courseId: this.couserID
+				}).then(res => {
+					if (res.res.status == 0) {
+						_this.testArr = res.inf.arr
+					} else {
+						uni.showModal({
+							title: res.res.errMsg
+						})
+					}
+				})
 			},
 
 			//点击学院按钮
@@ -591,7 +632,8 @@
 						success: function(res) {
 							if (res.confirm) {
 								//跳转购买
-								console.log("tobuy");
+								_this.tobuy()
+								
 							} else if (res.cancel) {
 								console.log('用户点击取消');
 							}
@@ -747,6 +789,9 @@
 			font-size: 16px;
 			align-items: center;
 			line-height: 45px;
+		}
+		.scorl_child_item_select{
+			color: #e8654b;
 		}
 	}
 
@@ -1076,5 +1121,39 @@
 			}
 		}
 
+	}
+
+	.test_item {
+		background-color: #FFFFFF;
+
+		.test_flex {
+			display: flex;
+			align-items: center;
+
+			.test_text {
+				flex: 1;
+				color: #666666;
+				font-size: 14px;
+				line-height: 40px;
+				margin-left: 10px;
+			}
+
+			.test_btn {
+				border: 1px solid #e6e6e6;
+				color: #e6e6e6;
+				border-radius: 5px;
+				margin-right: 10px;
+				font-size: 14px;
+				text-align: center;
+				line-height: 25px;
+				width: 60px;
+				height: 25px;
+			}
+
+			.test_btn_ok {
+				border: 1px solid #e8654b;
+				color: #e8654b;
+			}
+		}
 	}
 </style>

@@ -16,12 +16,6 @@
 			}
 		},
 		{
-			"path": "pages/record/record",
-			"style": {
-				"navigationBarTitleText": "学习记录"
-			}
-		},
-		{
 			"path": "pages/mine/login",
 			"style": {
 				"navigationBarTitleText": "登录"
@@ -171,7 +165,34 @@
 				"navigationBarTitleText": "绑定手机号"
 			}
 			
+		},
+		{
+			"path":"pages/home/test/test",
+			"style":{
+				"navigationBarTitleText":"测试",
+				"enablePullDownRefresh": true  ,
+				"backgroundTextStyle": "dark"
+			}
+		},
+		{
+			"path":"pages/home/test/beginTest",
+			"style":{
+				"navigationBarTitleText":"考试详情"
+			}
+		},
+		{
+			"path":"pages/home/test/testDetail",
+			"style":{
+				"navigationBarTitleText":"考试"
+			}
+		},
+		{
+			"path":"pages/home/bigImage",
+			"style":{
+				"navigationBarTitleText":"详情"
+			}
 		}
+        
         
     ],
 	"globalStyle": {
@@ -205,15 +226,7 @@
 	            "name": "home", //模式名称
 	            "path": "pages/home/home" //启动页面，必选
 	            // "query": "interval=4000&autoplay=false" //启动参数，在页面的onLoad函数里面得到。
-	        },
-	        {
-	            "name": "vdodetail",
-	            "path": "pages/home/videoDetail"
-	        },
-			{
-			    "name": "comment",
-			    "path": "pages/home/VdoDetail/VideoDetailcomment"
-			}
+	        }
 	    ]
 	}
 }

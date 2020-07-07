@@ -124,6 +124,7 @@
 							var dict = res.inf;
 							console.log(dict);
 							uni.setStorageSync('userId', dict.userId);
+							uni.setStorageSync('ifFill','true')
 							uni.showToast({
 								title: '登录中···'
 							});
@@ -132,6 +133,11 @@
 									delta: 2
 								})
 							}, 1500)
+							
+						}else{
+							uni.showToast({
+								title:res.res.errMsg
+							});
 						}
 					})
 

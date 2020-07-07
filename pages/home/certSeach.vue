@@ -58,6 +58,7 @@
 		},
 		onLoad() {
 			self = this
+			
 		},
 		onPullDownRefresh() {
 			self.page = 1

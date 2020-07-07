@@ -45,6 +45,13 @@
 			}
 		},
 
+		onShow() {
+				let iffill = uni.getStorageSync('isFill')
+				if(iffill !== 'true'){
+					uni.removeStorageSync('userId')
+					uni.removeStorageSync('loginKey')
+				}
+		},
 
 		onLoad() {
 			self = this;
@@ -188,6 +195,21 @@
 												}
 											})
 											
+										}else{
+											uni.setStorage({
+												key: "loginKey",
+												data: res.inf.loginKey,
+												success() {
+													uni.showToast({
+														title: '微信登录中···'
+													});
+													setTimeout(function() {
+														uni.navigateBack({
+															delta:1
+														})
+													}, 1000)
+												}
+											})
 										}
 										
 									}

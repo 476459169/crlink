@@ -32,7 +32,7 @@
 
 		<view class="listView">
 			<view class="course" v-for="(item, index) in listArr" :key="index" @click="itemClick(item)">
-				<image :src="baseurl+item.imgUrl" class="itemImage"></image>
+				<image :src="baseUrl+item.imgUrl" class="itemImage"></image>
 				<view class="itemContent">
 					<view style="font-size: 17px;">
 						{{item.name}}
@@ -67,7 +67,7 @@
 	export default {
 		data() {
 			return {
-				baseurl: "http://39.105.48.243:8080/crlink/",
+				baseUrl: "http://39.105.48.243:8080/crlink/",
 				couserArr: [],
 				lbArr: [],
 				selectArr: [],
@@ -84,6 +84,7 @@
 		},
 		onLoad() {
 			_this = this;
+			this.baseUrl =  getApp().globalData.baseUrl
 			_this.getCouserType()
 			_this.getLBType()
 			_this.getMianData(1)

@@ -20,7 +20,7 @@
 
 		<view class="listView">
 			<view v-if="selectIndex==1" class="course" v-for="(item,index) in collegeArr" :key="index" @click="itemClick(item)">
-				<image :src="baseurl+item.imgUrl" class="itemImage"></image>
+				<image :src="baseUrl+item.imgUrl" class="itemImage"></image>
 				<view class="itemContent">
 					<view style="font-size: 17px;">
 						{{item.name}}
@@ -45,7 +45,7 @@
 			</view>
 			
 			<view v-if="selectIndex==2" class="course" v-for="(item,index) in couserArr" :key="index" @click="itemClick(item)">
-				<image :src="baseurl+item.imgUrl" class="itemImage"></image>
+				<image :src="baseUrl+item.imgUrl" class="itemImage"></image>
 				<view class="itemContent">
 					<view style="font-size: 17px;">
 						{{item.title}}
@@ -77,7 +77,7 @@
 	export default {
 		data() {
 			return {
-				baseurl: "http://39.105.48.243:8080/crlink/",
+				baseUrl: "http://39.105.48.243:8080/crlink/",
 				selectIndex: 1,
 				collegeArr: [],
 				couserArr: []
@@ -85,7 +85,9 @@
 		},
 
 		onLoad() {
+			
 			self = this;
+			this.baseUrl =  getApp().globalData.baseUrl
 			self.getData()
 		},
 
