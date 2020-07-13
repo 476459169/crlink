@@ -21,7 +21,7 @@
 
 
 		<view class="" v-else>
-			<view class="top_selectView">
+			<!-- <view class="top_selectView">
 				<view class="line"></view>
 				<view class="top_flex" @click="topViewClcik(1)">
 					<view class="select_text">
@@ -40,30 +40,30 @@
 					</view>
 				</view>
 
-			</view>
+			</view> -->
 
 			<view class="table_list">
 				<view class="cell" v-for="(item,index) in dataArr" :key="index" @click="itemClick(item)">
 					<view class="cell_title">{{item.examName}}</view>
-					<view class="cell_item">
+					<!-- <view class="cell_item">
 						<image class="cell_img" src="../../../static/image/mine/studyImg.png" mode=""></image>
 						<text class="cell_text">考试开始时间：{{item.startTime}}</text>
 					</view>
 					<view class="cell_item">
 						<image class="cell_img" src="../../../static/image/mine/studyImg.png" mode=""></image>
 						<text class="cell_text">考试结束时间：{{item.endTime}}</text>
-					</view>
+					</view> -->
 					<view class="cell_item">
 						<image class="cell_img" src="../../../static/image/mine/studyImg.png" mode=""></image>
 						<text class="cell_text">总分：{{item.examTotalScore}}</text>
 
-						<view v-if="item.examStatus == '未报名'"></view>
+						<!-- <view v-if="item.examStatus == '未报名'"></view>
 						<view v-else-if="item.examStatus == '已报名'" class="cell_ybm">
 							已报名
 						</view>
 						<view v-else-if="item.examStatus == '已结束'" class="cell_js">
 							已结束
-						</view>
+						</view> -->
 
 					</view>
 					<view class="line" style="margin-top: 10px;"></view>
@@ -111,14 +111,17 @@
 				dataArr: [],
 				examScoreArr: [],
 				scorePage: false,
+				examId:''
+				
 
 
 
 			};
 		},
 
-		onLoad() {
+		onLoad(e) {
 			_this = this
+			_this.examId = e.examId;
 		},
 
 		onShow() {
@@ -138,12 +141,12 @@
 		
 
 		methods: {
-
 			getListData(index) {
 				let loginKey = uni.getStorageSync('loginKey')
-				this.$api.post('exam!ajaxGetExamByConditions.action', {
+				this.$api.post('college!ajaxGetExam.action', {
 					loginKey: loginKey,
-					selExamStatus: index
+					// selExamStatus: index,
+					 examId:_this.examId
 				}).then(res => {
 					console.log("res = " + res);
 					if (res.res.status == 0) {
@@ -157,8 +160,9 @@
 
 			getUserExamScore() {
 				let loginKey = uni.getStorageSync('loginKey')
-				this.$api.post('exam!ajaxGetUserExamScore.action', {
-					loginKey: loginKey
+				this.$api.post('college!ajaxGetUserExamScore.action', {
+					loginKey: loginKey,
+					 examId:_this.examId
 				}).then(res => {
 					console.log("res = " + res);
 					if (res.res.status == 0) {
@@ -171,49 +175,24 @@
 
 
 			itemClick(item) {
-				if (item.examStatus === "未报名") {
-					//预约
-					uni.showModal({
-						title: "预约考试",
-						content: "是否确认预约考试\n" + item.examName,
-						success: function(res) {
-							if (res.confirm) {
-								let loginKey = uni.getStorageSync('loginKey')
-								_this.$api.post('exam!ajaxSignUpExam.action', {
-									loginKey: loginKey,
-									examId: item.id
-								}).then(res => {
-									console.log("res = " + res);
-									if (res.inf.status === "报名成功") {
-										// console.log("baoming" + jsObject);
-										uni.showToast({
-											title: "报名成功"
-										})
-										_this.getListData(_this.selectTypeIndex)
-										
-									} else {
-										uni.showToast({
-											title: res.inf.status,
-										
-										});
-									}
-								})
-							} else if (res.cancel) {
-								console.log('用户点击取消');
-							}
-						}
+				if(item.isPass == 1 ){
+					uni.showToast({
+						title:'测试已合格'
 					})
-				} else if (item.examStatus === "已报名") {
-					//已报名
-					uni.navigateTo({
-						url: './beginTest?examId=' + item.id
-					})
-				} else if (item.examStatus === "已结束") {
-					//已结束
-				} else {
-					uni.navigateTo({
-						url: './beginTest?examId=' + item.id
-					})
+					
+					
+				}else{
+					
+					if(item.status ==''){
+						uni.navigateTo({
+							url:'./videoBeginTest?examId='+item.id
+						})
+					}else{
+						uni.navigateTo({
+							url:'./videoTestDetail?examId='+item.id+'&partExamRecordId='+item.examRecordId
+						})
+					}
+					
 				}
 
 
@@ -366,7 +345,7 @@
 	}
 
 	.table_list {
-		margin-top: 45px;
+		margin-top: 0px;
 		width: 100%;
 		background-color: #FFFFFF;
 

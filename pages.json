@@ -191,6 +191,26 @@
 			"style":{
 				"navigationBarTitleText":"详情"
 			}
+		},
+		{
+			"path":"pages/home/test/videoTest",
+			"style":{
+				"navigationBarTitleText":"测试"
+			}
+		},
+			
+		{
+			"path":"pages/home/test/videoBeginTest",
+			"style":{
+				"navigationBarTitleText":"测试"
+			}
+		},
+			
+		{
+			"path":"pages/home/test/videoTestDetail",
+			"style":{
+				"navigationBarTitleText":"测试"
+			}
 		}
         
         

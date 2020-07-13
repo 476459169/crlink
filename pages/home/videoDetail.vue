@@ -130,7 +130,7 @@
 						<view class="test_text">
 							{{item.examName}}
 						</view>
-						<view class="test_btn" :class="[item.examScore.length>0?'':item.isCompleted == '1'?'test_btn_ok':'']">
+						<view class="test_btn" :class="[item.examScore.length>0?'':item.isCompleted == '1'?'test_btn_ok':'']" @click="goExam(item)">
 							{{item.examScore.length>0?item.examScore:'去测试'}}
 						</view>
 					</view>
@@ -309,17 +309,18 @@
 			vedioTimeUpDate(e) {
 				//如果间隔超过3秒钟 说明有拖动 返回最后记录的播放时间
 
-				if (this.seekTime > 0) {
-					this.videoLastTime = this.seekTime;
-					this.videoContext.seek(this.seekTime);
-					this.seekTime = 0;
-				} else if (parseInt(e.detail.currentTime) - parseInt(this.videoLastTime) > 3 || parseInt(this.videoLastTime) -
-					parseInt(e.detail.currentTime) > 3) {
-					this.videoContext.seek(this.videoLastTime);
+				// if (this.seekTime > 0) {
+				// 	this.videoLastTime = this.seekTime;
+				// 	this.videoContext.seek(this.seekTime);
+				// 	this.seekTime = 0;
+				// } else if (parseInt(e.detail.currentTime) - parseInt(this.videoLastTime) > 3 || parseInt(this.videoLastTime) -
+				// 	parseInt(e.detail.currentTime) > 3) {
+				// 	this.videoContext.seek(this.videoLastTime);
 
-				} else {
-					this.videoLastTime = e.detail.currentTime;
-				}
+				// } else {
+				// 	this.videoLastTime = e.detail.currentTime;
+				// }
+				this.videoLastTime = e.detail.currentTime
 
 			},
 
@@ -332,7 +333,9 @@
 
 
 			videoEnd(e) {
+				console.log("videoEnd");
 				this.uploadVideoPlayTime('YES')
+				this.getExamList()
 			},
 
 			//获取详情信息
@@ -474,7 +477,7 @@
 				this.$api.post('index!ajaxAddCourseRecordHistory.action', {
 					loginKey: loginkey,
 					userId: userId,
-					courseId: _this.myData.id,
+					courseId: _this.couserID,
 					partNum: _this.videoItem.partTitle,
 					coursePartId: _this.videoItem.partId,
 					teacherName: _this.myData.author,
@@ -501,6 +504,16 @@
 						// })
 					}
 				})
+			},
+			
+			//跳转测试
+			goExam(item){
+				
+				if(item.isCompleted == '1'){
+					uni.navigateTo({
+						url:'./test/videoTest?examId='+item.examId
+					})
+				}
 			},
 
 			//评价
